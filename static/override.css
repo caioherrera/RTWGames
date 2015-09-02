@@ -1,8 +1,36 @@
 body {
-    padding-top:10px;
+    padding-top: 80px;
 }
 
 .navbar-brand {
     padding-top: 0px;
     padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+
+.navbar-nav {
+    padding-top: 5px;
+}
+
+.navbar-right {
+    padding-right: 20px;
+}
+
+.navbar .nav-divider {
+    height: 50px;
+    margin: 0 9px;
+    border-right: 1px solid #e0e0e0;
+}
+
+#subtitle {
+    font-size: 19px;
+}
+
+hr {
+    margin-left: -80px;
+    margin-right: -80px;
+}   
+
+.jumbotron {
+    height: 121px;
 }
