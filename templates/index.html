@@ -1,14 +1,33 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <title>Teste inicial: Flask</title>
+        <meta charset="utf-8">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='override.css') }}">
+        <title>RTW :: Games</title>
     </head>
-    <body>
-        <h1>Hello world!</h1>
-        <h2>And hello, {{ nome }}!</h2>
-        <ul>
-            <li> Primeira página Flask</li>
-            <li> Primeira página Flask</li>
-            <li> Primeira página Flask</li>
-        </ul>
+    <body>  
+        <div class="container-fluid">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <h4 class="navbar-brand">
+                            <a href="#">RTW :: Games<br></a>
+                            <small>Research Project at Federal University of São Carlos</small>
+                        </h4>
+                    </div>
+                </div>
+            </nav>
+            <p class="lead text-center">This website is the result of a scientific project focused on the ability of a computer to <strong>learn from humans</strong>, as they collaborate with the research just by <strong>playing games</strong> and <strong>having fun.</strong></p><hr>
+            <ul>
+                <li> Primeira página Flask</li>
+                <li> Primeira página Flask</li>
+                <li> Primeira página Flask</li>
+            </ul>
+            <address>
+                <strong>Caio Guimarães Herrera</strong><br>
+                <a href="mailto:caio.herrera@outlook.com">caio.herrera@outlook.com</a>
+            </address>
+        </div>
     </body>
 </html>

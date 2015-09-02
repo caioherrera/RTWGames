@@ -3,6 +3,5 @@ from app import app
 
 @app.route("/")
 @app.route("/index")
-@app.route("/index/<nome>")
-def helloWorld(nome="Caio"):
+def index():
     return render_template("index.html", nome=nome)
