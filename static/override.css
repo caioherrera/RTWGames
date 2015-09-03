@@ -47,6 +47,7 @@ h4 small, .navbar-inverse .navbar-nav > li > a {
 
 .navbar-fixed-top {
     background-color: #000;
+    position: absolute;
 }
 
 #subtitle {
@@ -62,6 +63,14 @@ hr {
     color: #3784c6;
 }
 
+.marketing {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+}
+
 li .active {
     background-color: #ff0000;
 }
@@ -69,4 +78,13 @@ li .active {
 .jumbotron {
     padding-top: 30px;
     padding-bottom: 30px;
+}
+
+.footer-divider {
+    margin-top: 80px;
+}
+
+.text-justify {
+    padding-left: 5px;
+    padding-right: 5px;
 }
