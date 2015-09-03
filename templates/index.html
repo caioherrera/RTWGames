@@ -18,22 +18,25 @@
                 </div>
                 <div class="navbar-collapse collapse">  
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="{{ url_for('index') }}">Home</a></li>
-                        <li><a href="/overview">Project Overview</a></li>
-                        <li><a href="/people">People</a></li>
+                        <li class="links active"><a href="{{ url_for('index') }}">Home</a></li>
+                        <li class="links"><a href="/overview">Project Overview</a></li>
+                        <li class="links"><a href="/people">People</a></li>
                         <li class="nav-divider"></li>
-                        <li><a id="login" href="/login">Login</a></li>
-                        <li><a id="register" href="/register">Register</a></li>
+                        <li class="links"><a id="login" href="/login">Login</a></li>
+                        <li class="links"><a id="register" href="/register">Register</a></li>
                     </ul>
                 </div>
                 </div>
             </nav>
         </div>
         <div class="jumbotron">
-        <div class="container">
-            <h1>Learning with games</h1>
-            <p class="lead" id="subtitle">This website is the result of a scientific project focused on the ability of a computer to <strong>learn from humans</strong>, as they collaborate with the research just by <strong>playing games</strong> and <strong>having fun.</strong></p>
-        </div>
+            <div class="container">
+                <h1>Learning with games</h1>
+                <p class="lead" id="subtitle">This website is the result of a scientific project focused on the ability of a computer to <strong>learn from humans</strong>, as they collaborate with the research just by <strong>playing games</strong> and <strong>having fun.</strong></p>
+                <p class="lead">
+                    <a class="btn btn-lg btn-primary" href="/overview">Read more</a>
+                </p>
+            </div>
         </div>
 
         <div class="container">

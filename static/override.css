@@ -26,6 +26,29 @@ h4 small, .navbar-inverse .navbar-nav > li > a {
     border-right: 1px solid #444;
 }
 
+.links {
+    padding-right: 3px;
+    padding-left: 3px;
+}
+
+.links > a {
+    border-bottom: 2px solid transparent;
+    background-color: #000 !important;
+}
+
+.active > a {
+    border-bottom-color: #fff;
+}
+
+.links > a:hover {
+    color: #cfcfcf !important;
+    border-bottom-color: #cfcfcf;
+}
+
+.navbar-fixed-top {
+    background-color: #000;
+}
+
 #subtitle {
     font-size: 19px;
 }
@@ -37,4 +60,13 @@ hr {
 
 #title {
     color: #3784c6;
+}
+
+li .active {
+    background-color: #ff0000;
+}
+
+.jumbotron {
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
