@@ -2,9 +2,9 @@
 <head>
 	<meta charset="utf-8">
     {% if code == 0 or code == 3 %}
-        <meta http-equiv="refresh" content="1;url={{ url_for('firstGame', game = game) }}">
+        <meta http-equiv="refresh" content="1;url={{ url_for('secondGame', game = game) }}">
     {% endif %}
-	<script type="text/javascript" src="{{ url_for('static', filename='firstGame.js') }}"></script>
+	<!-- <script type="text/javascript" src="{{ url_for('static', filename='secondGame.js') }}"></script> -->
 	<title>First Game - RTW :: Games</title>
 </head>
 <body>	
@@ -16,26 +16,26 @@
 	<a href="{{ url_for('games') }}">Games</a>
 	<a href="{{ url_for('logout') }}">Logout</a> ({{ username }})
 	<hr>
-	<h3>First Game</h3>
+	<h3>Second Game</h3>
         {% if code == 0 %}
-            {% block code0 %}
+            <!-- {% block code0 %}
                 <p>Waiting for your opponent...</p>
-            {% endblock code0 %}
+            {% endblock code0 %} -->
 		{% else %}
         {% if code == 3 %}
-            {% block code3 %}
+            <!-- {% block code3 %}
                 <p>Game over! Waiting for your opponent...</p>
-            {% endblock code3 %}
+            {% endblock code3 %} -->
         {% else %}
             {% if code == 1 or code == 10 %}
-                {% block code1 %}
+                <!-- {% block code1 %}
                     <p>This game has been finished.</p>
 					{% if code == 10 %}
 					<p>You scored {{ score }} points!</p>
 					{% endif %}
-                {% endblock code1 %}
+                {% endblock code1 %} -->
             {% else %}
-                {% if code == 2 %}
+                <!-- {% if code == 2 %}
                     {% block code2 %}
                 		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}','{{ theme }}')"><br>
                 		<p>The theme of the round is</p>
@@ -59,11 +59,11 @@
 							<input type="hidden" id="data" name="data">
 						</post>
                 		<p id="timer"></p>
-                    {% endblock code2 %}
+                    {% endblock code2 %} -->
                 {% else %}
-                    {% block code4 %}
-						<p>This game does not exist.</p>
-                    {% endblock code4 %}
+                    <!-- {% block code4 %}
+
+                    {% endblock code4 %} -->
                 {% endif %}
             {% endif %}
         {% endif %}

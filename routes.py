@@ -139,24 +139,27 @@ def firstGame(game = None):
 					else:
 						return render_template("firstGame.html", username = user["user"], code = 0, theme = theme, game = str(game["_id"]), _id = str(user["_id"]))
 			else:
+				idGame = -1
+				theme = ""
+				status = 4
+				if len(game) != 24:
+					return render_template("firstGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 				identifications = dict()
 				identifications["_id"] = ObjectId(game)
 				game = getGame(identifications)
 				if game != None:
 					theme = game["theme"]
 					status = game["status"]
-				else:
-					theme = ""
-					status = 4
+					idGame = game["_id"]
 				if status == 1:
 					if user["_id"] == userFromGame(identifications, 1):
-						return render_template("firstGame.html", username = user["user"], code = 10, theme = theme, game = str(game["_id"]), _id = str(user["_id"]), score = int(game["score1"]))
+						return render_template("firstGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]))
 					elif user["_id"] == userFromGame(identifications, 2):
-						return render_template("firstGame.html", username = user["user"], code = 10, theme = theme, game = str(game["_id"]), _id = str(user["_id"]), score = int(game["score2"]))
+						return render_template("firstGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score2"]))
 					else:
-						return render_template("firstGame.html", username = user["user"], code = 1, theme = theme, game = str(game["_id"]), _id = str(user["_id"]))
+						return render_template("firstGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]))
 				else:
-					return render_template("firstGame.html", username = user["user"], code = status, theme = theme, game = str(game["_id"]), _id = str(user["_id"]))
+					return render_template("firstGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 		else:
 			return redirect(url_for("login"))
 	else:
