@@ -1,6 +1,11 @@
 from flask import Flask
-#from flask import Flask, request, render_template, url_for
+from flask.ext.pymongo import PyMongo
+
 app = Flask("RTWGames")
+
+app.secret_key = "APIBG-Ge0-dha-1\h09-wqx[sj'n1"
+
+mongo = PyMongo(app)
 
 wsgi_app = app.wsgi_app
 

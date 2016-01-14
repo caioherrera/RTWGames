@@ -1,0 +1,52 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Register - RTW :: Games</title>
+</head>
+<body>
+	<h2>RTW :: Games</h2>
+	<h3>Research Project at Federal University of São Carlos</h3>
+	<a href="{{ url_for('index') }}">Home</a>
+	<a href="{{ url_for('overview') }}">Project Overview</a>
+	<a href="{{ url_for('people') }}">People</a>
+	<a href="{{ url_for('login') }}">Login</a>
+	<a href="{{ url_for('register') }}">Register</a>
+	<hr>
+	<h3>Register</h3>
+        {% if code != 1 %} 
+            {% block code0 %}
+        		<form method="POST">
+	        		Email <input type="email" id="email" name="email"><br>
+	        		Username <input type="text" id="user" name="user"><br>
+	        		Password <input type="password" id="password" name="password"><br>
+	        		Confirm Password <input type="password" id="confPassword" name="confPassword"><br> 
+	        		<input type="submit" value="Register" id="submit">
+	        	</form>
+            {% endblock code0 %}
+        {% else %}
+                {% block code1 %}
+                     <h2>Usuário criado com sucesso!</h2>
+                     <a href="{{ url_for('index') }}">Voltar</a>
+                {% endblock code1 %}
+        {% endif %}
+        {% if code == 2 %}
+                {% block code2 %}
+                <h4>As senhas não conferem.</h4>
+                {% endblock code2 %}
+        {% elif code == 3 %}
+                {% block code3 %}
+                <h4>Nome de usuário já cadastrado.</h4>
+                {% endblock code3 %}
+        {% elif code == 4 %}
+                {% block code4 %}
+                <h4>Email já cadastrado.</h4>
+                {% endblock code4 %}
+        {% elif code == 5 %}
+                {% block code5 %}
+                <h4>Falha no banco de dados.</h4>
+                {% endblock code5 %}
+        {% endif %}
+	<hr>
+	<strong>Caio Guimarães Herrera</strong> · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+</body>
+</html>
