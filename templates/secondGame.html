@@ -4,7 +4,7 @@
     {% if code == 0 or code == 3 %}
         <meta http-equiv="refresh" content="1;url={{ url_for('secondGame', game = game) }}">
     {% endif %}
-	<!-- <script type="text/javascript" src="{{ url_for('static', filename='secondGame.js') }}"></script> -->
+	<script type="text/javascript" src="{{ url_for('static', filename='secondGame.js') }}"></script>
 	<title>First Game - RTW :: Games</title>
 </head>
 <body>	
@@ -33,16 +33,16 @@
                 		<tr>
                 			<td>
                 				<p>Next guess</p>
-                				<input type="text" readonly="true" id="next" onkeypress="return testClick(event);">
+                				<p><input type="text" readonly="true" id="next" onkeypress="return testClick(event);"></p>
+			                	<p><input type="text" readonly="true" id="theme"></p>
                 			</td>
-                			<td></td>
+							<td width=50></td>
                 			<td>
 								<p>Hints</p>
                 				<select size=5 readonly="true" id="list" width="100"></select>
                 			</td>
                 		</tr>
                 	</table>
-                	<input type="text" readonly="true" id="theme">
 					<form name="sendData" method="POST" action="/endGame">
 						<input type="hidden" id="number" name="number" value="1">
 						<input type="hidden" id="game" name="game" value="{{ game }}">
