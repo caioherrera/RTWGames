@@ -166,6 +166,69 @@ def firstGame(game = None):
 		return redirect(url_for("login"))
 
 
+#################################### SECOND GAME ####################################
+@app.route("/secondGame")
+@app.route("/secondGame/<game>")
+def secondGame(game = None):
+	if session.get("user"):
+		identifications = dict()
+		identifications["user"] = session["user"]
+		user = getUser(identifications)
+		if user != None:
+			if game == None:
+				identifications = dict()
+				category = pickRandomCategory()
+				theme = category["name"]
+				identifications["gameType"] = 2
+				identifications["theme"] = theme
+				game = createGame(identifications)
+				identifications["_id"] = game
+				joinGame(identifications, user["_id"])
+
+				dataId = dict()
+				dataId["category"] = theme
+
+				#ascending order from score
+				sortCriteria = [("score", 1)]
+				maxValues = 10
+
+				data2 = str()
+				first = True				
+				for i in generateData(dataId, sortCriteria, maxValues):
+					if not first:
+						data2 += "||"
+					first = False
+					data2 += str(i)
+
+				identifications["data2"] = data2
+				startGame(identifications)
+				return render_template("secondGame.html", username = user["user"], code = 2, theme = theme, game = str(game), _id = str(user["_id"]))
+			else:
+				idGame = -1
+				theme = ""
+				status = 4
+				if len(game) != 24:
+					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
+				identifications = dict()
+				identifications["_id"] = ObjectId(game)
+				game = getGame(identifications)
+				if game != None:
+					theme = game["theme"]
+					status = game["status"]
+					idGame = game["_id"]
+				if status == 1:
+					if user["_id"] == userFromGame(identifications, 1):
+						return render_template("secondGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]))
+					else:
+						return render_template("secondGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]))
+				else:
+					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
+		else:
+			return redirect(url_for("login"))
+	else:
+		return redirect(url_for("login"))
+
+
 #################################### ENDGAME ####################################
 @app.route("/endGame", methods = ["POST"])
 def endGame():
@@ -225,7 +288,7 @@ def update():
 		string += "<br>"
 	string += "<hr>"
 	
-	cursor = mongo.db.feedback.find({})
+	cursor = mongo.db.feedbacks.find({})
 	for fb in cursor:
 		string += str(fb) + "<br><br>"
 

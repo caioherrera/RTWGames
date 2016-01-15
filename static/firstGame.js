@@ -62,7 +62,7 @@ function startTimer(duration, display, username) {
 			next = document.getElementById("next");
 			next.value = "";
 			next.readOnly = true;
-			//NÃO SEI O QUE FAZER MAS É AQUI QUE EU TENHO QUE FAZER
+			timer = 0
 			data = document.getElementById("data");
 			data.value = objects;
 			document.forms["sendData"].submit();

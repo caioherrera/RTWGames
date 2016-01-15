@@ -102,8 +102,8 @@ def calculateScores(player1, player2, category, gameType):
 		return score1, score2
 	return -1, -1
 
-def generateData(identifications, uniqueKey, sortCriteria, maxValues):
-	cursor = mongo.db.feedbacks.find(identifications).distinct(uniqueKey).sort(sortCriteria)
+def generateData(identifications, sortCriteria, maxValues):
+	cursor = mongo.db.feedbacks.find(identifications).sort(sortCriteria)
 	data = []
 	if cursor.count() > 0:
 		for i in range(min(maxValues, cursor.count())): 

@@ -86,11 +86,12 @@ def createGame(identifications):
 	identifications["createdTime"] = createdTime
 	identifications["user1"] = None
 	identifications["data1"] = None
-	identifications["score1"] = None
-	identifications["data2"] = None #for game type 2, data2 will be the collection of hints
+	identifications["score1"] = 0
+	if not "data2" in identifications.keys():
+		identifications["data2"] = None 			#for game type 2, data2 will be the collection of hints
+	identifications["score2"] = 0 					#for game type 2, score2 will store the number of hints needed for the user to give the correct answer
 	if identifications["gameType"] != 2:
 		identifications["user2"] = None
-		identifications["score2"] = None
 	identifications["start"] = None
 	identifications["finish"] = None
 	identifications["status"] = 0

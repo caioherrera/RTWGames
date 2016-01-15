@@ -31,7 +31,7 @@
                 {% block code1 %}
                     <p>This game has been finished.</p>
 					{% if code == 10 %}
-					<p>You scored {{ score }} points!</p>
+						<p>You scored {{ score }} points!</p>
 					{% endif %}
                 {% endblock code1 %}
             {% else %}
@@ -57,7 +57,7 @@
 							<input type="hidden" id="game" name="game" value="{{ game }}">
 							<input type="hidden" id="user" name="user" value="{{ _id }}">
 							<input type="hidden" id="data" name="data">
-						</post>
+						</form>
                 		<p id="timer"></p>
                     {% endblock code2 %}
                 {% else %}
