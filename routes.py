@@ -202,7 +202,7 @@ def secondGame(game = None):
 
 				identifications["data2"] = data2
 				startGame(identifications)
-				return render_template("secondGame.html", username = user["user"], code = 2, theme = theme, game = str(game), _id = str(user["_id"]))
+				return render_template("secondGame.html", username = user["user"], code = 2, theme = theme, game = str(game), _id = str(user["_id"]), data = data2)
 			else:
 				idGame = -1
 				theme = ""

@@ -27,7 +27,7 @@
         {% else %}
             {% if code == 2 %}
             	{% block code2 %}
-             		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}','{{ theme }}')"><br>
+             		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}','{{ theme }}', '{{ data }}')"><br>
                 	<p>Guess the theme of the round!</p>
                 	<table>
                 		<tr>
@@ -38,16 +38,24 @@
                 			</td>
 							<td width=50></td>
                 			<td>
+								<p>Previous guesses</p>
+                				<select size=5 readonly="true" id="guesses" width="100"></select>
+                			</td>
+							<td width=50></td>
+                			<td>
 								<p>Hints</p>
-                				<select size=5 readonly="true" id="list" width="100"></select>
+                				<select size=5 readonly="true" id="hints" width="100"></select>
                 			</td>
                 		</tr>
                 	</table>
 					<form name="sendData" method="POST" action="/endGame">
-						<input type="hidden" id="number" name="number" value="1">
+						<input type="hidden" id="number" name="number" value="2">
 						<input type="hidden" id="game" name="game" value="{{ game }}">
 						<input type="hidden" id="user" name="user" value="{{ _id }}">
-						<input type="hidden" id="data" name="data">
+						<input type="hidden" id="data1" name="data1">
+						<input type="hidden" id="data2" name="data2">
+						<input type="hidden" id="count" name="count">
+						<input type="hidden" id="score" name="score">
 					</form>
                 	<p id="timer"></p>
                 {% endblock code2 %}
