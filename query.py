@@ -173,20 +173,41 @@ def finishGame(identifications):
 		if cursor[0]["data1"] != None and cursor[0]["data2"] != None:
 			subIdentifications = dict()
 			subIdentifications["name"] = str(cursor[0]["theme"])
-			category = subCategoryBelongsTo(subIdentifications)
+			if int(cursor[0]["gameType"]) == 1:
+				category = subCategoryBelongsTo(subIdentifications)
+			else:
+				cur = mongo.db.categories.find(subIdentifications)
+				if cur.count() == 0:
+					category = None
+				else:
+					category = cur[0]
 			if category == None:
 				return False
 			data1 = str.split(str(cursor[0]["data1"]).lower(), "||")
 			data2 = str.split(str(cursor[0]["data2"]).lower(), "||")
 			gameType = int(cursor[0]["gameType"])
-			score1, score2 = calculateScores(data1, data2, category["name"], gameType)
-			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			updates = dict()
+			if gameType == 1:
+				score1, score2 = calculateScores(data1, data2, category["name"], gameType)
+				updates["score1"] = score1
+				if "score2" in cursor[0].keys():
+					updates["score2"] = score2
+			elif gameType == 2:
+				for i in range(cursor[0]["score2"]):
+					for category in data1:
+						entity = data2[i]
+						exists, score = existsInNell(entity, category)
+						fbIdent = dict()
+						fbUpdates = dict()
+						fbIdent["entity"] = entity
+						fbIdent["category"] = category
+						fbUpdates["score"] = score
+						fbUpdates["count"] = 1
+						addFeedback(fbIdent, fbUpdates)
+
+			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			updates["status"] = 1
 			updates["finish"] = finish
-			updates["score1"] = score1
-			if "score2" in cursor[0].keys():
-				updates["score2"] = score2
 			return updateGame(identifications, updates)
 		else:
 			updates = dict()

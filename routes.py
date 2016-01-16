@@ -182,6 +182,7 @@ def secondGame(game = None):
 				identifications["gameType"] = 2
 				identifications["theme"] = theme
 				game = createGame(identifications)
+				identifications = dict()
 				identifications["_id"] = game
 				joinGame(identifications, user["_id"])
 
@@ -200,14 +201,17 @@ def secondGame(game = None):
 					first = False
 					data2 += str(i)
 
-				identifications["data2"] = data2
-				startGame(identifications)
+				updates = dict()
+				updates["data2"] = data2
+				updateGame(identifications, updates)
+				print("a", file = sys.stderr)
 				return render_template("secondGame.html", username = user["user"], code = 2, theme = theme, game = str(game), _id = str(user["_id"]), data = data2)
 			else:
 				idGame = -1
 				theme = ""
 				status = 4
 				if len(game) != 24:
+					print("b", file = sys.stderr)
 					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 				identifications = dict()
 				identifications["_id"] = ObjectId(game)
@@ -218,10 +222,13 @@ def secondGame(game = None):
 					idGame = game["_id"]
 				if status == 1:
 					if user["_id"] == userFromGame(identifications, 1):
+						print("c", file = sys.stderr)
 						return render_template("secondGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]))
 					else:
+						print("d", file = sys.stderr)
 						return render_template("secondGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]))
 				else:
+					print("e", file = sys.stderr)
 					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 		else:
 			return redirect(url_for("login"))
@@ -232,24 +239,33 @@ def secondGame(game = None):
 #################################### ENDGAME ####################################
 @app.route("/endGame", methods = ["POST"])
 def endGame():
-	number = request.form["number"]
+	number = int(request.form["number"])
 	user = ObjectId(request.form["user"])
 	identifications = dict()
 	identifications["_id"] = ObjectId(request.form["game"])
 	updates = dict()
-	if(userFromGame(identifications, 1) == user):
-		updates["data1"] = request.form["data"]
-	else:
-		if(number == "2"):
-			#change it later
+	if number == 1:
+		if userFromGame(identifications, 1) == user:
 			updates["data1"] = str(request.form["data"]).encode("UTF-8")
 		else:
 			updates["data2"] = str(request.form["data"]).encode("UTF-8")
-		
+	elif number == 2:
+		updates["data1"] = str(request.form["data1"]).encode("UTF-8")
+		updates["data2"] = str(request.form["data2"]).encode("UTF-8")
+		updates["score1"] = int(request.form["score"])
+		updates["score2"] = int(request.form["count"])
+		print("ok", file = sys.stderr)
+	else:
+		#change it later
+		updates["data1"] = str(request.form["data1"]).encode("UTF-8")		
+	print("identification: " + str(identifications), file = sys.stderr)
+	print("updates: " + str(updates), file = sys.stderr)
 	updateGame(identifications, updates)
 	finishGame(identifications)
-	if number == "1":
+	if number == 1:
 		return redirect(url_for("firstGame", game = str(identifications["_id"])))
+	elif number == 2:
+		return redirect(url_for("secondGame", game = str(identifications["_id"])))
 	#change it later
 	return "Hello"
 
@@ -278,6 +294,9 @@ def update():
 	mongo.db.subcategories.insert_one({"name": "Heavy Metal musics", "category": cursor[0]["_id"]})
 	mongo.db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})'''
 
+	#mongo.db.games.remove({"gameType": 2})
+	#mongo.db.feedbacks.remove({"category": "movie"})
+
 	cursor = mongo.db.categories.find({})
 	string = str()
 	for category in cursor:
@@ -292,7 +311,7 @@ def update():
 	for fb in cursor:
 		string += str(fb) + "<br><br>"
 
-	cursor = mongo.db.games.find({})
+	cursor = mongo.db.games.find({"gameType": 2})
 	for c in cursor:
 		string += str(c)
 	

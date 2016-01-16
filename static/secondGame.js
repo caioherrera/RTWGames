@@ -3,21 +3,24 @@ var theme = "";
 var data2 = "";
 var data = [];
 var count = 0;
-var score = 30;
+var score = 35;
 var endGame = false;
 
 function testClick(e) {
 	e = e || window.event;
 	if(e.keyCode == 13) {
-		newObject("guesses", document.getElementById("next").value, true);
-		data1.push(document.getElementById("next").value);
-		if(theme == document.getElementById("next").value) {
+		value = document.getElementById("next").value;
+		newObject("guesses", value, true);
+		if(theme == value) {
+			document.getElementById("theme").readOnly = false;
 			document.getElementById("theme").value = "Correct answer!";
+			document.getElementById("theme").readOnly = true;
 			endGame = true;
 			end();
 		}
-		else
+		else {
 			document.getElementById("theme").value = "Wrong answer!";
+		}
 		document.getElementById("next").value = "";
 		return false;
 	}
