@@ -204,14 +204,12 @@ def secondGame(game = None):
 				updates = dict()
 				updates["data2"] = data2
 				updateGame(identifications, updates)
-				print("a", file = sys.stderr)
 				return render_template("secondGame.html", username = user["user"], code = 2, theme = theme, game = str(game), _id = str(user["_id"]), data = data2)
 			else:
 				idGame = -1
 				theme = ""
 				status = 4
 				if len(game) != 24:
-					print("b", file = sys.stderr)
 					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 				identifications = dict()
 				identifications["_id"] = ObjectId(game)
@@ -222,13 +220,10 @@ def secondGame(game = None):
 					idGame = game["_id"]
 				if status == 1:
 					if user["_id"] == userFromGame(identifications, 1):
-						print("c", file = sys.stderr)
 						return render_template("secondGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]))
 					else:
-						print("d", file = sys.stderr)
 						return render_template("secondGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]))
 				else:
-					print("e", file = sys.stderr)
 					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 		else:
 			return redirect(url_for("login"))
@@ -254,12 +249,9 @@ def endGame():
 		updates["data2"] = str(request.form["data2"]).encode("UTF-8")
 		updates["score1"] = int(request.form["score"])
 		updates["score2"] = int(request.form["count"])
-		print("ok", file = sys.stderr)
 	else:
 		#change it later
 		updates["data1"] = str(request.form["data1"]).encode("UTF-8")		
-	print("identification: " + str(identifications), file = sys.stderr)
-	print("updates: " + str(updates), file = sys.stderr)
 	updateGame(identifications, updates)
 	finishGame(identifications)
 	if number == 1:
