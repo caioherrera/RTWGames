@@ -56,6 +56,8 @@ def pickRandomSubCategory(identifications):
 def createUser(identifications):
 	identifications["online"] = False
 	identifications["score"] = 0
+	regDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")	
+	identifications["regDate"] = regDate
 	_id = mongo.db.users.insert_one(identifications)
 	return _id.inserted_id
 

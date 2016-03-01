@@ -10,7 +10,8 @@
 	<a href="{{ url_for('overview') }}">Project Overview</a>
 	<a href="{{ url_for('people') }}">People</a>
 	<a href="{{ url_for('games') }}">Games</a>
-	<a href="{{ url_for('logout') }}">Logout</a> ({{ username }})	
+	(<a href="{{ url_for('profile') }}">{{ username }}</a>)
+    <a href="{{ url_for('logout') }}">Logout</a>	
 	<hr>
 	<h3>Games</h3>
 		<ul>

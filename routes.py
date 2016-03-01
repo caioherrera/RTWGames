@@ -21,6 +21,19 @@ def index():
     else:
 	    return render_template("index.html", code = 0)
 
+#################################### PROFILE ####################################
+@app.route("/profile")
+def profile():
+    if session.get("user"):
+		identifications = dict()
+		identifications["user"] = session["user"]
+		if isUserOnline(identifications):
+			user = getUser(identifications)
+			return render_template("profile.html", _id = user["_id"], username = user["user"], email = user["email"], score = user["score"], regDate = user["regDate"])
+		else:
+			return redirect(url_for("login"))
+    else:
+	    return redirect(url_for("login"))
 
 #################################### LOGIN ####################################
 @app.route("/login", methods=["GET", "POST"])
@@ -69,13 +82,29 @@ def register():
 #################################### OVERVIEW ####################################
 @app.route("/overview")
 def overview():
-    return
+    if session.get("user"):
+		identifications = dict()
+		identifications["user"] = session["user"]
+		if isUserOnline(identifications):
+			return render_template("overview.html", code = 1, username = session["user"])
+		else:
+			return redirect(url_for("login"))
+    else:
+	    return render_template("overview.html", code = 0)
 
 
 #################################### PEOPLE ####################################
 @app.route("/people")
 def people():
-    return
+    if session.get("user"):
+		identifications = dict()
+		identifications["user"] = session["user"]
+		if isUserOnline(identifications):
+			return render_template("people.html", code = 1, username = session["user"])
+		else:
+			return redirect(url_for("login"))
+    else:
+	    return render_template("people.html", code = 0)
 
 
 #################################### LOGOUT ####################################
