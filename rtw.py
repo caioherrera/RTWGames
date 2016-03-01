@@ -1,22 +1,25 @@
 from __future__ import print_function
 from app import mongo
+from random import randint
 import sys
 
-#addFeedback(identifications, updates): void
+#addFeedback(identifications, updates, gameType): void
 #calculateScores(data1, data2, category, gameType): int, int
 #askNell(entity): list
 #existsInNell(entity, category): tuple(bool, float)
 #generateData(identifications, uniqueKey, sortCriteria, maxValues): list
+#pickRandomFeedback(identifications, sortCriteria, maxValues): dict
 
 #initial identifications: entity, category
 #initial updates: score, count
-def addFeedback(identifications, updates):
+def addFeedback(identifications, updates, gameType):
 	updates["isInNell"] = (updates["score"] != -1)
 	cursor = mongo.db.feedbacks.find(identifications)
 	if cursor.count() > 0:
 		updates["count"] += cursor[0]["count"]
 		mongo.db.feedbacks.update_one(identifications, {"$set": updates})
 	else:
+		updates["gameType"] = gameType
 		mongo.db.feedbacks.insert_one(dict(identifications.items() + updates.items()))
 
 def askNell(entity):
@@ -109,3 +112,8 @@ def generateData(identifications, sortCriteria, maxValues):
 		for i in range(min(maxValues, cursor.count())): 
 			data.append(str(cursor[i]["entity"]))
 	return data
+
+def pickRandomFeedback(identifications, sortCriteria, maxValues):
+	data = generateData(identifications, sortCriteria, maxValues)
+	rand = randint(0, len(data) - 1)
+	return data[rand]

@@ -15,6 +15,7 @@ import sys
 #getUser(identifications): dict | None
 #isUserOnline(identifications): bool
 #changeUserStatus(identifications, online): bool
+#updateScore(identifications, score): bool
 
 #createGame(identifications): ObjectId
 #updateGame(identifications, updates): bool
@@ -54,6 +55,7 @@ def pickRandomSubCategory(identifications):
 
 def createUser(identifications):
 	identifications["online"] = False
+	identifications["score"] = 0
 	_id = mongo.db.users.insert_one(identifications)
 	return _id.inserted_id
 
@@ -80,6 +82,14 @@ def changeUserStatus(identifications, online):
 	updates["online"] = online
 	return updateUser(identifications, updates)
 
+def updateScore(identifications, score):
+	cursor = mongo.db.uses.find(identifications)
+	if cursor.count() == 0:
+		return False
+	updates = dict()
+	updates["score"] = cursor[0]["score"] + score
+	return updateUser(identifications, updates)
+
 #initial identifications: gameType, theme
 def createGame(identifications):
 	createdTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -90,7 +100,7 @@ def createGame(identifications):
 	if not "data2" in identifications.keys():
 		identifications["data2"] = None 			#for game type 2, data2 will be the collection of hints
 	identifications["score2"] = 0 					#for game type 2, score2 will store the number of hints needed for the user to give the correct answer
-	if identifications["gameType"] != 2:
+	if identifications["gameType"] != 2 and identifications["gameType"] != 4:
 		identifications["user2"] = None
 	identifications["start"] = None
 	identifications["finish"] = None
@@ -167,6 +177,13 @@ def userFromGame(identifications, number):
 		return cursor[0]["user" + str(number)]
 	return None	
 
+def pickRandomGame(identifications):
+	cursor = mongo.db.games.find(identifications)
+	if cursor.count() == 0:
+		return None
+	rand = randint(0, cursor.count() - 1)
+	return cursor[rand]
+
 def finishGame(identifications):
 	cursor = mongo.db.games.find(identifications)
 	if cursor.count() > 0:
@@ -175,24 +192,33 @@ def finishGame(identifications):
 			subIdentifications["name"] = str(cursor[0]["theme"])
 			if int(cursor[0]["gameType"]) == 1:
 				category = subCategoryBelongsTo(subIdentifications)
-			else:
+				if category == None: 
+					return False
+			elif int(cursor[0]["gameType"]) == 2:
 				cur = mongo.db.categories.find(subIdentifications)
 				if cur.count() == 0:
-					category = None
+					return False
 				else:
 					category = cur[0]
-			if category == None:
-				return False
 			data1 = str.split(str(cursor[0]["data1"]).lower(), "||")
 			data2 = str.split(str(cursor[0]["data2"]).lower(), "||")
 			gameType = int(cursor[0]["gameType"])
 			updates = dict()
 			if gameType == 1:
-				score1, score2 = calculateScores(data1, data2, category["name"], gameType)
+				score1, score2 = calculateScores(data1, data2, category["name"], 1)
 				updates["score1"] = score1
+				idUser = dict()
+				idUser["_id"] = cursor[0]["user1"]
+				updateScore(idUser, score1)
 				if "score2" in cursor[0].keys():
 					updates["score2"] = score2
+					idUser["_id"] = cursor[0]["user2"]
+					updateScore(idUser, score2)
 			elif gameType == 2:
+				score1 = int(cursor[0]["score1"])
+				idUSer = dict()
+				idUser["_id"] = cursor[0]["user1"]
+				updateScore(idUser, score1)
 				for i in range(cursor[0]["score2"]):
 					for category in data1:
 						entity = data2[i]
@@ -203,8 +229,49 @@ def finishGame(identifications):
 						fbIdent["category"] = category
 						fbUpdates["score"] = score
 						fbUpdates["count"] = 1
-						addFeedback(fbIdent, fbUpdates)
-
+						addFeedback(fbIdent, fbUpdates, 2)
+			elif gameType == 3:
+				score1, score2 = int(cursor[0]["score1"]), int(cursor[0]["score2"])
+				idUSer = dict()
+				idUser["_id"] = cursor[0]["user1"]
+				updateScore(idUser, score1)
+				idUSer = dict()
+				idUser["_id"] = cursor[0]["user2"]
+				updateScore(idUser, score2)
+				for category in data1:
+					entity = subIdentifications["name"].split("||")[0]					
+					exists, score = existsInNell(entity, category)
+					fbIdent, fbUpdates = dict(), dict()
+					fbIdent["entity"] = entity
+					fbIdent["category"] = category
+					fbUpdates["score"] = score
+					fbUpdates["count"] = 1
+					addFeedback(fbIdent, fbUpdates, 2)
+				for category in data2:
+					entity = subIdentifications["name"].split("||")[1]					
+					exists, score = existsInNell(entity, category)
+					fbIdent, fbUpdates = dict(), dict()
+					fbIdent["entity"] = entity
+					fbIdent["category"] = category
+					fbUpdates["score"] = score
+					fbUpdates["count"] = 1
+					addFeedback(fbIdent, fbUpdates, 3)
+			else:
+				score1 = int(cursor[0]["score1"])
+				idUSer = dict()
+				idUser["_id"] = cursor[0]["user1"]
+				updateScore(idUser, score1)
+				for i in range(cursor[0]["score2"]):
+					for entity in data1:
+						category = data2[i]
+						exists, score = existsInNell(entity, category)
+						fbIdent = dict()
+						fbUpdates = dict()
+						fbIdent["entity"] = entity
+						fbIdent["category"] = category
+						fbUpdates["score"] = score
+						fbUpdates["count"] = 1
+						addFeedback(fbIdent, fbUpdates, 4)
 			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			updates["status"] = 1
 			updates["finish"] = finish
