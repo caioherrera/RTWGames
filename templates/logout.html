@@ -2,20 +2,30 @@
 <head>
 	<meta charset="utf-8">
     <meta http-equiv="refresh" content="1;url={{ url_for('index') }}">
+	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
 	<title>Logout - RTW :: Games</title>
 </head>
 <body>
-	<h2>RTW :: Games</h2>
-	<h3>Research Project at Federal University of São Carlos</h3>
-	<a href="{{ url_for('index') }}">Home</a>
-	<a href="{{ url_for('overview') }}">Project Overview</a>
-	<a href="{{ url_for('people') }}">People</a>
-	<a href="{{ url_for('login') }}">Login</a>
-	<a href="{{ url_for('register') }}">Register</a>
-	<hr>
-	<h3>Logout</h3>
-        <h3>If you are not redirected automatically, <a href="{{ url_for('index') }}">click here</a>.</h3>
-	<hr>
-	<strong>Caio Guimarães Herrera</strong> · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+	<div id="content">
+		<div id="header">
+			<h1>RTW :: Games<br><div id="subtitle">Research Project at Federal University of São Carlos</div></h1>
+			<nav>
+				<ul>
+					<li><a href="{{ url_for('index') }}">Home</a></li>
+					<li><a href="{{ url_for('overview') }}">Project Overview</a></li>
+					<li><a href="{{ url_for('people') }}">People</a></li>
+					<li><a href="{{ url_for('login') }}">Login</a></li>
+					<li><a href="{{ url_for('register') }}">Register</a></li>
+				</ul>
+			</nav>
+		</div>
+		<div id="body">
+			<h2>Logout</h2>
+        	<p>If you are not redirected automatically, <a href="{{ url_for('index') }}">click here</a>.</p><br>
+			<div id="footer">
+				Caio Guimarães Herrera · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

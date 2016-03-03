@@ -1,0 +1,142 @@
+body {
+	background-color: #E7F8FF;
+	font-family: helvetica;
+	text-align: left;
+}
+
+#header {
+	width: 800px;
+	display: block;
+	padding: 20px;
+	overflow: hidden;
+	margin: 5px auto;
+	border-radius: 10px;
+}
+
+#body {
+	background-color: #FFFFFF;
+	color: #08143C;
+	width: 760px;
+	display: block;
+	padding: 20px;
+	overflow: hidden;
+	margin: 5px auto;
+	border-radius: 10px;
+}
+
+h1 {
+	color: #00186F;
+	font-weight: 800;
+}
+
+h2 {
+	color: #C96600;
+	font-weight: 300;
+	font-size: 1.5em;
+}
+
+h3 {
+	font-weight: 300;
+	font-size: 1.05em;
+	padding: 0;
+	margin: 0;
+}
+
+#subtitle {
+	font-size: 0.5em;
+	font-weight: 400;
+}
+
+nav {
+	background-color: #0F1E50;
+	line-height: 30px;
+	border-radius: 5px;
+	height: 40px;
+	width: 800px;
+}
+
+ul {
+	padding: 0;
+	margin: 0px auto;
+}
+
+li {
+	display: inline;
+}
+
+nav li a {
+	color: #FFFFFF;
+	padding: 5px 1.5em;	
+	font-size: 0.9em;
+	display: inline-block;
+	float: left;
+}
+
+#header nav li:first-child a {
+	border-radius: 5px 0 0 5px;
+}
+
+#header nav li a:hover, .active a {
+	background-color: #FF8D00;
+}
+
+#footer {
+	text-align: right;	
+}
+
+#footer a {
+	color: #FF8D00;
+}
+
+a {
+	color: #FF8D00;
+	text-decoration: none;
+}
+
+pre {
+	font-family: helvetica;
+	padding: 0;
+	margin: 0;
+}
+
+.formField {
+	width: 140px;
+	display: inline-block;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+	border: solid 1px #00186F;
+	border-bottom-width: 3px;
+	border-radius: 6px;
+	transition: border 0.3s;
+	padding: 5px 10px 5px 10px;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+	border: solid 1px #FF8D00;
+	border-bottom-width: 3px;
+}
+
+.readOnly {
+	background-color: #EEEEEE;
+	color: #000;
+	border: solid 1px #00186F !important;
+	border-bottom-width: 3px !important;
+}
+
+input[type="submit"] {
+	border: none;
+	background-color: #00186F;
+	border-radius: 6px;
+	color: #FFFFFF;
+	padding: 5px;
+	width: 100px;
+}
+
+input[type="submit"]:hover {
+	background-color: #FF8D00;
+}
+
+#error {
+	color: #FF8D00;
+}
