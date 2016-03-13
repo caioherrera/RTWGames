@@ -85,7 +85,7 @@ def changeUserStatus(identifications, online):
 	return updateUser(identifications, updates)
 
 def updateScore(identifications, score):
-	cursor = mongo.db.uses.find(identifications)
+	cursor = mongo.db.users.find(identifications)
 	if cursor.count() == 0:
 		return False
 	updates = dict()
@@ -96,6 +96,7 @@ def updateScore(identifications, score):
 def createGame(identifications):
 	createdTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	identifications["createdTime"] = createdTime
+	identifications["finished"] = False
 	identifications["user1"] = None
 	identifications["data1"] = None
 	identifications["score1"] = 0
@@ -189,7 +190,8 @@ def pickRandomGame(identifications):
 def finishGame(identifications):
 	cursor = mongo.db.games.find(identifications)
 	if cursor.count() > 0:
-		if cursor[0]["data1"] != None and cursor[0]["data2"] != None:
+		if cursor[0]["data1"] != None and cursor[0]["data2"] != None and not cursor[0]["finished"]:
+			updateGame(identifications, {"finished": True})
 			subIdentifications = dict()
 			subIdentifications["name"] = str(cursor[0]["theme"])
 			if int(cursor[0]["gameType"]) == 1:
@@ -218,61 +220,69 @@ def finishGame(identifications):
 					updateScore(idUser, score2)
 			elif gameType == 2:
 				score1 = int(cursor[0]["score1"])
-				idUSer = dict()
+				idUser = dict()
 				idUser["_id"] = cursor[0]["user1"]
 				updateScore(idUser, score1)
 				for i in range(cursor[0]["score2"]):
 					for category in data1:
 						entity = data2[i]
-						exists, score = existsInNell(entity, category)
+						#exists, score = existsInNell(entity, category)
+						exists, score = None, -1
 						fbIdent = dict()
 						fbUpdates = dict()
 						fbIdent["entity"] = entity
 						fbIdent["category"] = category
 						fbUpdates["score"] = score
 						fbUpdates["count"] = 1
+						fbUpdates["lazy"] = True
 						addFeedback(fbIdent, fbUpdates, 2)
 			elif gameType == 3:
 				score1, score2 = int(cursor[0]["score1"]), int(cursor[0]["score2"])
-				idUSer = dict()
+				idUser = dict()
 				idUser["_id"] = cursor[0]["user1"]
 				updateScore(idUser, score1)
-				idUSer = dict()
+				idUser = dict()
 				idUser["_id"] = cursor[0]["user2"]
 				updateScore(idUser, score2)
 				for category in data1:
 					entity = subIdentifications["name"].split("||")[0]					
-					exists, score = existsInNell(entity, category)
+					#exists, score = existsInNell(entity, category)
+					exists, score = None, -1
 					fbIdent, fbUpdates = dict(), dict()
 					fbIdent["entity"] = entity
 					fbIdent["category"] = category
 					fbUpdates["score"] = score
 					fbUpdates["count"] = 1
-					addFeedback(fbIdent, fbUpdates, 2)
+					fbUpdates["lazy"] = True
+					addFeedback(fbIdent, fbUpdates, 3)
 				for category in data2:
 					entity = subIdentifications["name"].split("||")[1]					
-					exists, score = existsInNell(entity, category)
+					#exists, score = existsInNell(entity, category)
+					exists, score = None, -1
 					fbIdent, fbUpdates = dict(), dict()
 					fbIdent["entity"] = entity
 					fbIdent["category"] = category
 					fbUpdates["score"] = score
 					fbUpdates["count"] = 1
+					fbUpdates["lazy"] = True
 					addFeedback(fbIdent, fbUpdates, 3)
 			else:
 				score1 = int(cursor[0]["score1"])
-				idUSer = dict()
+				idUser = dict()
 				idUser["_id"] = cursor[0]["user1"]
 				updateScore(idUser, score1)
 				for i in range(cursor[0]["score2"]):
 					for entity in data1:
 						category = data2[i]
-						exists, score = existsInNell(entity, category)
+						#exists, score = existsInNell(entity, category)
+						exists, score = None, -1
 						fbIdent = dict()
 						fbUpdates = dict()
 						fbIdent["entity"] = entity
 						fbIdent["category"] = category
 						fbUpdates["score"] = score
 						fbUpdates["count"] = 1
+						fbUpdates["lazy"] = True
 						addFeedback(fbIdent, fbUpdates, 4)
 			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			updates["status"] = 1

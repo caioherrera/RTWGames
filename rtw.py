@@ -13,7 +13,7 @@ import sys
 #initial identifications: entity, category
 #initial updates: score, count
 def addFeedback(identifications, updates, gameType):
-	updates["isInNell"] = (updates["score"] != -1)
+	updates["isInNell"] = (updates["score"] != -1 and not updates["lazy"])
 	cursor = mongo.db.feedbacks.find(identifications)
 	if cursor.count() > 0:
 		updates["count"] += cursor[0]["count"]
@@ -47,61 +47,65 @@ def calculateScores(player1, player2, category, gameType):
 	if gameType == 1:
 		score1, score2 = 0, 0
 		for e in player1:
-			exists, score = existsInNell(e, category)
-			identifications = dict()
-			identifications["entity"] = e
-			identifications["category"] = category
-			updates = dict()
-			if exists:
-				updates["score"] = score
-				if score > 0.7:
+			if e != "":
+				exists, score = existsInNell(e, category)
+				identifications = dict()
+				identifications["entity"] = e
+				identifications["category"] = category
+				updates = dict()
+				updates["lazy"] = False
+				if exists:
+					updates["score"] = score
+					if score > 0.7:
+						if e in player2:
+							updates["count"] = 2
+							score1 += 10
+							score2 += 10
+							player2.remove(e)
+						else:
+							updates["count"] = 1
+							score1 += 4
+					else:
+						if e in player2:
+							updates["count"] = 2
+							score1 += 12
+							score2 += 12
+							player2.remove(e)
+						else:
+							updates["count"] = 1
+							score1 += 7
+				else:
+					updates["score"] = -1
 					if e in player2:
 						updates["count"] = 2
-						score1 += 10
-						score2 += 10
+						score1 += 15
+						score2 += 15
 						player2.remove(e)
 					else:
 						updates["count"] = 1
-						score1 += 4
-				else:
-					if e in player2:
-						updates["count"] = 2
-						score1 += 12
-						score2 += 12
-						player2.remove(e)
-					else:
-						updates["count"] = 1
-						score1 += 7
-			else:
-				updates["score"] = -1
-				if e in player2:
-					updates["count"] = 2
-					score1 += 15
-					score2 += 15
-					player2.remove(e)
-				else:
-					updates["count"] = 1
-					score1 += 2
-			addFeedback(identifications, updates)
-	
+						score1 += 2
+				addFeedback(identifications, updates, gameType)
+
 		for e in player2:
-			exists, score = existsInNell(e, category)
-			identifications = dict()
-			identifications["entity"] = e
-			identifications["category"] = category
-			updates = dict()
-			updates["count"] = 1
-			if exists:
-				updates["score"] = score
-				if score > 0.7:
-					score2 += 4
+			if e != "":
+				exists, score = existsInNell(e, category)
+				identifications = dict()
+				identifications["entity"] = e
+				identifications["category"] = category
+				updates = dict()
+				updates["lazy"] = False
+				updates["count"] = 1
+				if exists:
+					updates["score"] = score
+					if score > 0.7:
+						score2 += 4
+					else:
+						score2 += 7
 				else:
-					score2 += 7
-			else:
-				updates["score"] = -1
-				score2 += 2
-			addFeedback(identifications, updates)
-	
+					updates["score"] = -1
+					score2 += 2
+				addFeedback(identifications, updates, gameType)
+
 		return score1, score2
 	return -1, -1
 

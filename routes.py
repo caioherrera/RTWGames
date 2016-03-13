@@ -441,13 +441,13 @@ def endGame():
 @app.route("/update")
 def update():
 
-	mongo.db.feedbacks.remove({})
+	'''mongo.db.feedbacks.remove({})
 	mongo.db.games.remove({})
 	mongo.db.subcategories.remove({})
 	mongo.db.categories.remove({})
 	mongo.db.users.remove({})
 	mongo.db.feedbacks.remove({})
-	#session.clear()
+	session.clear()
 
 	mongo.db.categories.insert_one({"name": "book"})
 	cursor = mongo.db.categories.find({"name": "book"})
@@ -462,7 +462,7 @@ def update():
 	mongo.db.categories.insert_one({"name": "musicsong"})
 	cursor = mongo.db.categories.find({"name": "musicsong"})
 	mongo.db.subcategories.insert_one({"name": "Heavy Metal musics", "category": cursor[0]["_id"]})
-	mongo.db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})
+	mongo.db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})'''
 
 	#mongo.db.games.remove({"gameType": 3})
 	#mongo.db.games.remove({"gameType": 4})
@@ -477,17 +477,31 @@ def update():
 			string += "<li>" + subcategory["name"] + "</li>"
 		string += "<br>"
 	string += "<hr>"
-	
-	cursor = mongo.db.feedbacks.find({})
-	for fb in cursor:
-		string += str(fb) + "<br><br>"
 
-	cursor = mongo.db.games.find({"gameType": 4})
+	cursor = mongo.db.feedbacks.find()
+	string = str()
 	for c in cursor:
-		string += str(c)
-	
+		string += "<p>Entity: " + c["entity"] + "<br>"
+		string += "Category: " + c["category"] + "<br>"
+		string += "Count: " + str(c["count"]) + "<br>"
+		string += "IsInNell: " + str(c["isInNell"]) + "<br>"
+		string += "Score: " + str(c["score"]) + "<br>"
+		string += "Lazy: " + str(c["lazy"]) + "</p>"
+
 	return string
 
+#################################### LAZY ####################################
+@app.route("/lazy")
+def lazy():
+	cursor = mongo.db.feedbacks.find({"lazy": True})
+	string = str()
+	for c in cursor:
+		string += "<p>Entity: " + c["entity"] + "<br>"
+		string += "Category: " + c["category"] + "<br>"
+		string += "Count: " + str(c["count"]) + "<br>"
+		string += "Score: " + str(c["score"]) + "</p>"
+
+	return string
 
 #################################### ERROR ####################################
 @app.errorhandler(404)
