@@ -494,14 +494,20 @@ def update():
 @app.route("/lazy")
 def lazy():
 	cursor = mongo.db.feedbacks.find({"lazy": True})
-	string = str()
+	i = cursor.count()
 	for c in cursor:
-		string += "<p>Entity: " + c["entity"] + "<br>"
-		string += "Category: " + c["category"] + "<br>"
-		string += "Count: " + str(c["count"]) + "<br>"
-		string += "Score: " + str(c["score"]) + "</p>"
+		identifications = dict()
+		identifications["_id"] = c["_id"]
+		updates = dict()
+		updates["lazy"] = False
+		exists, score = existsInNell(c["entity"], c["category"])
+		if not exists:
+			score = -1
+		updates["isInNell"] = exists
+		updates["score"] = score
+		mongo.db.feedbacks.update_one(identifications, {"$set": updates})
 
-	return string
+	return str(i) + " registers updated."
 
 #################################### ERROR ####################################
 @app.errorhandler(404)
