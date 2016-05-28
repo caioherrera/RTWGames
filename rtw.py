@@ -121,3 +121,4 @@ def pickRandomFeedback(identifications, sortCriteria, maxValues):
 	data = generateData(identifications, sortCriteria, maxValues)
 	rand = randint(0, len(data) - 1)
 	return data[rand]
+

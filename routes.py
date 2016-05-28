@@ -1,6 +1,6 @@
 from __future__ import print_function
 from flask import Flask, request, render_template, url_for, redirect, session
-from app import app, mongo
+from app import app, mongo, db
 from random import randint
 from bson.objectid import ObjectId
 from query import *
@@ -441,6 +441,30 @@ def endGame():
 @app.route("/update")
 def update():
 
+	db.feedbacks.remove({})
+	db.games.remove({})
+	db.subcategories.remove({})
+	db.categories.remove({})
+	db.users.remove({})
+	db.feedbacks.remove({})
+	session.clear()
+
+	db.categories.insert_one({"name": "book"})
+	cursor = db.categories.find({"name": "book"})
+	db.subcategories.insert_one({"name": "Sci-fi books", "category": cursor[0]["_id"]})
+	db.subcategories.insert_one({"name": "Self-help books", "category": cursor[0]["_id"]})
+	
+	db.categories.insert_one({"name": "movie"})
+	cursor = db.categories.find({"name": "movie"})
+	db.subcategories.insert_one({"name": "Action movies", "category": cursor[0]["_id"]})
+	db.subcategories.insert_one({"name": "Comedy movies", "category": cursor[0]["_id"]})
+
+	db.categories.insert_one({"name": "musicsong"})
+	cursor = db.categories.find({"name": "musicsong"})
+	db.subcategories.insert_one({"name": "Heavy Metal musics", "category": cursor[0]["_id"]})
+	db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})
+
+
 	'''mongo.db.feedbacks.remove({})
 	mongo.db.games.remove({})
 	mongo.db.subcategories.remove({})
@@ -468,17 +492,20 @@ def update():
 	#mongo.db.games.remove({"gameType": 4})
 	#mongo.db.feedbacks.remove({"category": "movie"})
 
-	cursor = mongo.db.categories.find({})
+	#cursor = mongo.db.categories.find({})
+	cursor = db.categories.find({})
 	string = str()
 	for category in cursor:
 		string += category["name"] + ": "
-		cursor2 = mongo.db.subcategories.find({"category": category["_id"]})
+		#cursor2 = mongo.db.subcategories.find({"category": category["_id"]})
+		cursor2 = db.subcategories.find({"category": category["_id"]})
 		for subcategory in cursor2:
 			string += "<li>" + subcategory["name"] + "</li>"
 		string += "<br>"
 	string += "<hr>"
 
-	cursor = mongo.db.feedbacks.find()
+	#cursor = mongo.db.feedbacks.find()
+	cursor = db.feedbacks.find()
 	string = str()
 	for c in cursor:
 		string += "<p>Entity: " + c["entity"] + "<br>"
@@ -493,7 +520,8 @@ def update():
 #################################### LAZY ####################################
 @app.route("/lazy")
 def lazy():
-	cursor = mongo.db.feedbacks.find({"lazy": True})
+	#cursor = mongo.db.feedbacks.find({"lazy": True})
+	cursor = db.feedbacks.find({"lazy": True})
 	i = cursor.count()
 	for c in cursor:
 		identifications = dict()
@@ -505,7 +533,8 @@ def lazy():
 			score = -1
 		updates["isInNell"] = exists
 		updates["score"] = score
-		mongo.db.feedbacks.update_one(identifications, {"$set": updates})
+		#mongo.db.feedbacks.update_one(identifications, {"$set": updates})
+		db.feedbacks.update_one(identifications, {"$set": updates})
 
 	return str(i) + " registers updated."
 
@@ -513,3 +542,4 @@ def lazy():
 @app.errorhandler(404)
 def page_not_found(error):
     return "404 :: Page not found"
+

@@ -1,5 +1,5 @@
 from __future__ import print_function
-from app import mongo
+from app import mongo, db
 from datetime import datetime
 from bson.objectid import ObjectId
 from random import randint
@@ -29,25 +29,29 @@ import sys
 #finishGame(identifications): bool
 
 def subCategoryBelongsTo(identifications):
-	cursor = mongo.db.subcategories.find(identifications)
+	#cursor = mongo.db.subcategories.find(identifications)
+	cursor = db.subcategories.find(identifications)
 	if cursor.count() > 0:
 		identifications = dict()
 		identifications["_id"] = cursor[0]["category"]
-		cursor = mongo.db.categories.find(identifications)
+		#cursor = mongo.db.categories.find(identifications)
+		cursor = db.categories.find(identifications)
 		if cursor.count() > 0:
 			return cursor[0]
 		return None
 	return None
 
 def pickRandomCategory():
-	cursor = mongo.db.categories.find({})
+	#cursor = mongo.db.categories.find({})
+	cursor = db.categories.find({})
 	if cursor.count() == 0:
 		return None
 	rand = randint(0, cursor.count() - 1)
 	return cursor[rand]	
 
 def pickRandomSubCategory(identifications):
-	cursor = mongo.db.subcategories.find(identifications)
+	#cursor = mongo.db.subcategories.find(identifications)
+	cursor = db.subcategories.find(identifications)
 	if cursor.count() == 0:
 		return None
 	rand = randint(0, cursor.count() - 1)
@@ -58,18 +62,22 @@ def createUser(identifications):
 	identifications["score"] = 0
 	regDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")	
 	identifications["regDate"] = regDate
-	_id = mongo.db.users.insert_one(identifications)
+	#_id = mongo.db.users.insert_one(identifications)
+	_id = db.users.insert_one(identifications)
 	return _id.inserted_id
 
 def updateUser(identifications, updates):
-	cursor = mongo.db.users.find(identifications)
+	#cursor = mongo.db.users.find(identifications)
+	cursor = db.users.find(identifications)
 	if cursor.count() > 0:
-		mongo.db.users.update_one(identifications, {"$set": updates})
+		#mongo.db.users.update_one(identifications, {"$set": updates})
+		db.users.update_one(identifications, {"$set": updates})
 		return True
 	return False
 
 def getUser(identifications):
-	cursor = mongo.db.users.find(identifications)
+	#cursor = mongo.db.users.find(identifications)
+	cursor = db.users.find(identifications)
 	if cursor.count() > 0:
 		return cursor[0]
 	return None
@@ -79,13 +87,15 @@ def isUserOnline(identifications):
 	return user != None and user["online"]
 
 def changeUserStatus(identifications, online):
-	cursor = mongo.db.users.find(identifications)
+	#cursor = mongo.db.users.find(identifications)
+	cursor = db.users.find(identifications)
 	updates = dict()
 	updates["online"] = online
 	return updateUser(identifications, updates)
 
 def updateScore(identifications, score):
-	cursor = mongo.db.users.find(identifications)
+	#cursor = mongo.db.users.find(identifications)
+	cursor = db.users.find(identifications)
 	if cursor.count() == 0:
 		return False
 	updates = dict()
@@ -108,18 +118,22 @@ def createGame(identifications):
 	identifications["start"] = None
 	identifications["finish"] = None
 	identifications["status"] = 0
-	_id = mongo.db.games.insert_one(identifications)
+	#_id = mongo.db.games.insert_one(identifications)
+	_id = db.games.insert_one(identifications)
 	return _id.inserted_id
 
 def updateGame(identifications, updates):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	if cursor.count() > 0:
-		mongo.db.games.update_one(identifications, {"$set": updates})
+		#mongo.db.games.update_one(identifications, {"$set": updates})
+		db.games.update_one(identifications, {"$set": updates})
 		return True
 	return False
 
 def getGame(identifications):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	if cursor.count() > 0:
 		return cursor[0]
 	return None
@@ -133,14 +147,16 @@ def getGame(identifications):
 #4: jogo nao criado
 def findWaitingGame(identifications, user):
 	identifications["status"] = 0
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	for i in range(cursor.count()):
 		if cursor[i]["user1"] != user:
 			return cursor[i]
 	return None
 
 def joinGame(identifications, user):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	if cursor.count() > 0:
 		updates = dict()
 		if cursor[0]["user1"] == None:
@@ -153,13 +169,14 @@ def joinGame(identifications, user):
 	return False
 
 def isGameReady(identifications):
-    cursor = mongo.db.games.find(identifications)
-    if cursor.count() > 0:
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
+	if cursor.count() > 0:
 		if "user2" in cursor[0].keys():
 			return cursor[0]["user1"] != None and cursor[0]["user2"] != None
 		else:
 			return cursor[0]["user1"] != None
-    return False
+	return False
 
 def startGame(identifications):
 	start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -169,26 +186,30 @@ def startGame(identifications):
 	return updateGame(identifications, updates)   
 
 def checkGameStatus(identifications):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	for c in cursor:
 		return int(c["status"])
 	return 4
 
 def userFromGame(identifications, number):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	if cursor.count() > 0 and "user" + str(number) in cursor[0].keys():
 		return cursor[0]["user" + str(number)]
 	return None	
 
 def pickRandomGame(identifications):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	if cursor.count() == 0:
 		return None
 	rand = randint(0, cursor.count() - 1)
 	return cursor[rand]
 
 def finishGame(identifications):
-	cursor = mongo.db.games.find(identifications)
+	#cursor = mongo.db.games.find(identifications)
+	cursor = db.games.find(identifications)
 	if cursor.count() > 0:
 		if cursor[0]["data1"] != None and cursor[0]["data2"] != None and not cursor[0]["finished"]:
 			updateGame(identifications, {"finished": True})
@@ -199,7 +220,8 @@ def finishGame(identifications):
 				if category == None: 
 					return False
 			elif int(cursor[0]["gameType"]) == 2:
-				cur = mongo.db.categories.find(subIdentifications)
+				#cur = mongo.db.categories.find(subIdentifications)
+				cur = db.categories.find(subIdentifications)
 				if cur.count() == 0:
 					return False
 				else:
@@ -293,3 +315,4 @@ def finishGame(identifications):
 			updates["status"] = 3
 			return updateGame(identifications, updates)		
 	return False
+
