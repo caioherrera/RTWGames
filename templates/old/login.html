@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='override.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
+        <script src="{{ url_for('static', filename='scroll.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <title>Login · RTW :: Games</title>
+    </head>
+    <body> 
+        <div class="container">
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <h4 class="navbar-brand">
+                            <a id="title" href="{{ url_for('index') }}">RTW :: Games<br></a>
+                            <small>Research Project at Federal University of São Carlos</small>
+                        </h4>
+                    </div>
+                    <div class="navbar-collapse collapse">  
+                        <ul class="nav navbar-nav navbar-right">
+                            <li id="homeButton" class="links"><a href="{{ url_for('index') }}" onclick="smoothScroll('home', 'homeButton'); return false">Home</a></li>
+                            <li class="nav-divider"></li>
+                            <li class="links active"><a id="login" href="{{ url_for('login') }}">Login</a></li>
+                            <li class="links"><a id="register" href="/register">Register</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        
+        <div class="container">
+            <div class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+            			<div class="panel-title">Login to Your Account</div>
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal" role="form" method="POST">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+            					<input type="email" class="form-control" id="email" placeholder="Email"><br>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            					<input type="password" class="form-control" id="password" placeholder="Password"><br>
+                            </div>
+                            <div class="form-group controls text-right">
+            					<button name="login" class="btn btn-success" value="Login">Login</button>
+	        			</form>
+                    </div>
+                </div>
+            </div>
+        </div>			
+
+        <div class="container">
+            <footer class="footer text-right" style="position: absolute; bottom:0px;">
+        <hr class="footer-divider">
+                <address class="text-right">
+                    <strong>Caio Guimarães Herrera</strong> · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+                </address>  
+            </footer>
+        </div>
+    </body>
+</html>
+
