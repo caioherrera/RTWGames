@@ -1,7 +1,8 @@
 from flask import Flask
 from flask.ext.pymongo import MongoClient
 
-app = Flask("RTWGames", template_folder='/home/caioherrera/RTWGames/templates', static_folder='/home/caioherrera/RTWGames/static')
+#app = Flask("RTWGames", template_folder='/home/caioherrera/RTWGames/templates', static_folder='/home/caioherrera/RTWGames/static')
+app = Flask("RTWGames")
 
 app.secret_key = "APIBG-Ge0-dha-1\h09-wqx[sj'n1"
 
@@ -20,6 +21,6 @@ if __name__ == '__main__':
         PORT = int(os.environ.get('SERVER_PORT', '5555'))
     except ValueError:
         PORT = 5555
-    app.run(HOST, PORT, debug=True)
+    app.run(HOST, PORT, debug=True, threaded=True)
 
 
