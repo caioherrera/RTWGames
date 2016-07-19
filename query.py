@@ -6,6 +6,9 @@ from random import randint
 from rtw import *
 import sys
 
+games = dict();
+
+
 #subCategoryBelongsTo(identifications): dict | None
 #pickRandomCategory(): dict | None
 #pickRandomSubCategory(identifications): dict | None
@@ -120,23 +123,20 @@ def createGame(identifications):
 	identifications["status"] = 0
 	#_id = mongo.db.games.insert_one(identifications)
 	_id = db.games.insert_one(identifications)
+	games[_id.inserted_id] = identifications;
 	return _id.inserted_id
 
 def updateGame(identifications, updates):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() > 0:
-		#mongo.db.games.update_one(identifications, {"$set": updates})
-		db.games.update_one(identifications, {"$set": updates})
-		return True
-	return False
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		for key in updates.keys():
+			games[identifications["_id"]][key] = updates[key];
+		return True;
+	return False;
 
 def getGame(identifications):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() > 0:
-		return cursor[0]
-	return None
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		return games[identifications["_id"]];
+	return None;
 
 #initial identifications: gameType
 #STATUS:
@@ -146,37 +146,31 @@ def getGame(identifications):
 #3: parcialmente encerrado
 #4: jogo nao criado
 def findWaitingGame(identifications, user):
-	identifications["status"] = 0
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	for i in range(cursor.count()):
-		if cursor[i]["user1"] != user:
-			return cursor[i]
-	return None
+	waitingGame = None;
+	for gameID in games.keys():
+		if games[gameID]["status"] == 0 and games[gameID]["gameType"] == identifications["gameType"]:
+			waitingGame = games[gameID];			
+			break;
+	return waitingGame;
 
 def joinGame(identifications, user):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() > 0:
-		updates = dict()
-		if cursor[0]["user1"] == None:
-			updates["user1"] = user
-			return updateGame(identifications, updates)
-		elif "user2" in cursor[0].keys() and cursor[0]["user2"] == None:
-			updates["user2"] = user
-			return updateGame(identifications, updates)
-		return False
-	return False
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		updates = dict();
+		if games[identifications["_id"]]["user1"] == None:
+			updates["user1"] = user;
+			return updateGame(identifications, updates);
+		elif "user2" in games[identifications["_id"]].keys() and games[identifications["_id"]]["user2"] == None:
+			updates["user2"] = user;
+			return updateGame(identifications, updates);
+	return False;
 
 def isGameReady(identifications):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() > 0:
-		if "user2" in cursor[0].keys():
-			return cursor[0]["user1"] != None and cursor[0]["user2"] != None
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		if "user2" in games[identifications["_id"]].keys():
+			return games[identifications["_id"]]["user1"] != None and games[identifications["_id"]]["user2"] != None;
 		else:
-			return cursor[0]["user1"] != None
-	return False
+			return games[identifications["_id"]]["user1"] != None;
+	return False;
 
 def startGame(identifications):
 	start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -186,133 +180,130 @@ def startGame(identifications):
 	return updateGame(identifications, updates)   
 
 def checkGameStatus(identifications):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	for c in cursor:
-		return int(c["status"])
-	return 4
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		return games[identifications["_id"]]["status"];
+	return 4;
 
 def userFromGame(identifications, number):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() > 0 and "user" + str(number) in cursor[0].keys():
-		return cursor[0]["user" + str(number)]
-	return None	
 
-def pickRandomGame(identifications):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() == 0:
-		return None
-	rand = randint(0, cursor.count() - 1)
-	return cursor[rand]
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		if "user" + str(number) in games[identifications["_id"]].keys():
+			return games[identifications["_id"]]["user" + str(number)];
+	return None; 
+
+def saveGame(identifications):
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		selectedGame = games[identifications["_id"]];
+		db.games.update_one({"_id": identifications["_id"]},{"$set": selectedGame});
+		return True;
+	return False;
 
 def finishGame(identifications):
-	#cursor = mongo.db.games.find(identifications)
-	cursor = db.games.find(identifications)
-	if cursor.count() > 0:
-		if cursor[0]["data1"] != None and cursor[0]["data2"] != None and not cursor[0]["finished"]:
-			updateGame(identifications, {"finished": True})
+	if "_id" in identifications.keys() and identifications["_id"] in games.keys():
+		selectedGame = games[identifications["_id"]];
+		if selectedGame["data1"] != None and selectedGame["data2"] != None and not selectedGame["finished"]:
+			updateGame(identifications, {"finished": True});
 			subIdentifications = dict()
-			subIdentifications["name"] = str(cursor[0]["theme"])
-			if int(cursor[0]["gameType"]) == 1:
+			subIdentifications["name"] = str(selectedGame["theme"])
+			if int(selectedGame["gameType"]) == 1:
 				category = subCategoryBelongsTo(subIdentifications)
 				if category == None: 
 					return False
-			elif int(cursor[0]["gameType"]) == 2:
-				#cur = mongo.db.categories.find(subIdentifications)
-				cur = db.categories.find(subIdentifications)
+			elif int(selectedGame["gameType"]) == 2:
+				cur = db.categories.find(subIdentifications);
 				if cur.count() == 0:
-					return False
+					return False;
 				else:
-					category = cur[0]
-			data1 = str.split(str(cursor[0]["data1"]).lower(), "||")
-			data2 = str.split(str(cursor[0]["data2"]).lower(), "||")
-			gameType = int(cursor[0]["gameType"])
-			updates = dict()
+					category = cur[0];
+			data1 = str.split(str(selectedGame["data1"]).lower(), "||");
+			data2 = str.split(str(selectedGame["data2"]).lower(), "||");
+			gameType = int(selectedGame["gameType"]);
+			updates = dict();
+			
 			if gameType == 1:
-				score1, score2 = calculateScores(data1, data2, category["name"], 1)
-				updates["score1"] = score1
-				idUser = dict()
-				idUser["_id"] = cursor[0]["user1"]
-				updateScore(idUser, score1)
-				if "score2" in cursor[0].keys():
-					updates["score2"] = score2
-					idUser["_id"] = cursor[0]["user2"]
-					updateScore(idUser, score2)
+				score1, score2 = calculateScores(data1, data2, category["name"], 1);
+				updates["score1"] = score1;
+				idUser = dict();
+				idUser["_id"] = selectedGame["user1"];
+				updateScore(idUser, score1);
+				if "score2" in selectedGame.keys():
+					updates["score2"] = score2;
+					idUser["_id"] = selectedGame["user2"];
+					updateScore(idUser, score2);
+
 			elif gameType == 2:
-				score1 = int(cursor[0]["score1"])
-				idUser = dict()
-				idUser["_id"] = cursor[0]["user1"]
-				updateScore(idUser, score1)
-				for i in range(cursor[0]["score2"]):
+				score1 = int(selectedGame["score1"]);
+				idUser = dict();
+				idUser["_id"] = selectedGame["user1"];
+				updateScore(idUser, score1);
+				for i in range(selectedGame["score2"]):
 					for category in data1:
-						entity = data2[i]
+						entity = data2[i];
 						#exists, score = existsInNell(entity, category)
-						exists, score = None, -1
-						fbIdent = dict()
-						fbUpdates = dict()
-						fbIdent["entity"] = entity
-						fbIdent["category"] = category
-						fbUpdates["score"] = score
-						fbUpdates["count"] = 1
-						fbUpdates["lazy"] = True
-						addFeedback(fbIdent, fbUpdates, 2)
+						exists, score = None, -1;
+						fbIdent = dict();
+						fbUpdates = dict();
+						fbIdent["entity"] = entity;
+						fbIdent["category"] = category;
+						fbUpdates["score"] = score;
+						fbUpdates["count"] = 1;
+						fbUpdates["lazy"] = True;
+						addFeedback(fbIdent, fbUpdates, 2);
 			elif gameType == 3:
-				score1, score2 = int(cursor[0]["score1"]), int(cursor[0]["score2"])
-				idUser = dict()
-				idUser["_id"] = cursor[0]["user1"]
-				updateScore(idUser, score1)
-				idUser = dict()
-				idUser["_id"] = cursor[0]["user2"]
-				updateScore(idUser, score2)
+				score1, score2 = int(selectedGame["score1"]), int(selectedGame["score2"]);
+				idUser = dict();
+				idUser["_id"] = selectedGame["user1"];
+				updateScore(idUser, score1);
+				idUser = dict();
+				idUser["_id"] = selectedGame["user2"];
+				updateScore(idUser, score2);
 				for category in data1:
-					entity = subIdentifications["name"].split("||")[0]					
+					entity = subIdentifications["name"].split("||")[0];
 					#exists, score = existsInNell(entity, category)
-					exists, score = None, -1
-					fbIdent, fbUpdates = dict(), dict()
-					fbIdent["entity"] = entity
-					fbIdent["category"] = category
-					fbUpdates["score"] = score
-					fbUpdates["count"] = 1
-					fbUpdates["lazy"] = True
-					addFeedback(fbIdent, fbUpdates, 3)
+					exists, score = None, -1;
+					fbIdent, fbUpdates = dict(), dict();
+					fbIdent["entity"] = entity;
+					fbIdent["category"] = category;
+					fbUpdates["score"] = score;
+					fbUpdates["count"] = 1;
+					fbUpdates["lazy"] = True;
+					addFeedback(fbIdent, fbUpdates, 3);
 				for category in data2:
-					entity = subIdentifications["name"].split("||")[1]					
+					entity = subIdentifications["name"].split("||")[1];
 					#exists, score = existsInNell(entity, category)
-					exists, score = None, -1
-					fbIdent, fbUpdates = dict(), dict()
-					fbIdent["entity"] = entity
-					fbIdent["category"] = category
-					fbUpdates["score"] = score
-					fbUpdates["count"] = 1
-					fbUpdates["lazy"] = True
-					addFeedback(fbIdent, fbUpdates, 3)
+					exists, score = None, -1;
+					fbIdent, fbUpdates = dict(), dict();
+					fbIdent["entity"] = entity;
+					fbIdent["category"] = category;
+					fbUpdates["score"] = score;
+					fbUpdates["count"] = 1;
+					fbUpdates["lazy"] = True;
+					addFeedback(fbIdent, fbUpdates, 3);
 			else:
-				score1 = int(cursor[0]["score1"])
-				idUser = dict()
-				idUser["_id"] = cursor[0]["user1"]
-				updateScore(idUser, score1)
-				for i in range(cursor[0]["score2"]):
+				score1 = int(selectedGame["score1"]);
+				idUser = dict();
+				idUser["_id"] = selectedGame["user1"];
+				updateScore(idUser, score1);
+				for i in range(selectedGame["score2"]):
 					for entity in data1:
-						category = data2[i]
+						category = data2[i];
 						#exists, score = existsInNell(entity, category)
-						exists, score = None, -1
-						fbIdent = dict()
-						fbUpdates = dict()
-						fbIdent["entity"] = entity
-						fbIdent["category"] = category
-						fbUpdates["score"] = score
-						fbUpdates["count"] = 1
-						fbUpdates["lazy"] = True
-						addFeedback(fbIdent, fbUpdates, 4)
-			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-			updates["status"] = 1
-			updates["finish"] = finish
-			return updateGame(identifications, updates)
+						exists, score = None, -1;
+						fbIdent = dict();
+						fbUpdates = dict();
+						fbIdent["entity"] = entity;
+						fbIdent["category"] = category;
+						fbUpdates["score"] = score;
+						fbUpdates["count"] = 1;
+						fbUpdates["lazy"] = True;
+						addFeedback(fbIdent, fbUpdates, 4);
+			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S');
+			updates["status"] = 1;
+			updates["finish"] = finish;
+			return updateGame(identifications, updates) and saveGame(identifications);
 		else:
-			updates = dict()
-			updates["status"] = 3
-			return updateGame(identifications, updates)		
-	return False
+			updates = dict();
+			updates["status"] = 3;
+			return updateGame(identifications, updates) and saveGame(identifications);
+	return False;
 

@@ -1,5 +1,5 @@
 from __future__ import print_function
-from app import mongo
+from app import mongo, db
 from random import randint
 import sys
 
@@ -13,14 +13,17 @@ import sys
 #initial identifications: entity, category
 #initial updates: score, count
 def addFeedback(identifications, updates, gameType):
-	updates["isInNell"] = (updates["score"] != -1 and not updates["lazy"])
-	cursor = mongo.db.feedbacks.find(identifications)
+	updates["isInNell"] = ("score" in updates.keys() and "lazy" in updates.keys() and updates["score"] != -1 and not updates["lazy"])
+	#cursor = mongo.db.feedbacks.find(identifications)
+	cursor = db.feedbacks.find(identifications)
 	if cursor.count() > 0:
 		updates["count"] += cursor[0]["count"]
-		mongo.db.feedbacks.update_one(identifications, {"$set": updates})
+		#mongo.db.feedbacks.update_one(identifications, {"$set": updates})
+		db.feedbacks.update_one(identifications, {"$set": updates})
 	else:
 		updates["gameType"] = gameType
-		mongo.db.feedbacks.insert_one(dict(identifications.items() + updates.items()))
+		#mongo.db.feedbacks.insert_one(dict(identifications.items() + updates.items()))
+		db.feedbacks.insert_one(dict(identifications.items() + updates.items()))	
 
 def askNell(entity):
 	import json
@@ -110,7 +113,8 @@ def calculateScores(player1, player2, category, gameType):
 	return -1, -1
 
 def generateData(identifications, sortCriteria, maxValues):
-	cursor = mongo.db.feedbacks.find(identifications).sort(sortCriteria)
+	#cursor = mongo.db.feedbacks.find(identifications).sort(sortCriteria)
+	cursor = db.feedbacks.find(identifications).sort(sortCriteria)
 	data = []
 	if cursor.count() > 0:
 		for i in range(min(maxValues, cursor.count())): 

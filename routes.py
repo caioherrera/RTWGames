@@ -143,26 +143,34 @@ def firstGame(game = None):
 			if game == None:
 				identifications = dict()
 				identifications["gameType"] = 1
+				#FIND WAITING GAME
 				game = findWaitingGame(identifications, user["_id"])
 				if game == None:
+					#PICK RANDOM CATEGORY
 					category = pickRandomCategory()
 					identifications = dict()
 					identifications["category"] = category["_id"]
+					#PICK RANDOM SUBCATEGORY
 					subCategory = pickRandomSubCategory(identifications)
 					theme = subCategory["name"]
 					identifications = dict()
 					identifications["gameType"] = 1
 					identifications["theme"] = theme
+					#CREATE GAME
 					game = createGame(identifications)
 					identifications["_id"] = game
+					#JOIN GAME
 					joinGame(identifications, user["_id"])
 					return render_template("firstGame.html", username = user["user"], code = 0, theme = theme, game = str(game), _id = str(user["_id"]))
 				else:
 					identifications = dict()
 					identifications["_id"] = game["_id"]
+					#JOIN GAME
 					joinGame(identifications, user["_id"])
 					theme = game["theme"]
+					#IS GAME READY
 					if isGameReady(identifications):		
+						#START GAME
 						startGame(identifications)
 						return render_template("firstGame.html", username = user["user"], code = 2, theme = theme, game = str(game["_id"]), _id = str(user["_id"]))
 					else:
@@ -175,6 +183,7 @@ def firstGame(game = None):
 					return render_template("firstGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]))
 				identifications = dict()
 				identifications["_id"] = ObjectId(game)
+				#GET GAME
 				game = getGame(identifications)
 				if game != None:
 					theme = game["theme"]
@@ -210,6 +219,7 @@ def secondGame(game = None):
 			if game == None:
 				identifications = dict()
 				category = pickRandomCategory()
+				print(category, file = sys.stderr);
 				theme = category["name"]
 				identifications["gameType"] = 2
 				identifications["theme"] = theme
@@ -247,6 +257,8 @@ def secondGame(game = None):
 				identifications = dict()
 				identifications["_id"] = ObjectId(game)
 				game = getGame(identifications)
+				print(user, file = sys.stderr);
+				print(game, file = sys.stderr);
 				if game != None:
 					theme = game["theme"]
 					status = game["status"]
@@ -445,7 +457,7 @@ def update():
 	db.games.remove({})
 	db.subcategories.remove({})
 	db.categories.remove({})
-	db.users.remove({})
+	#db.users.remove({})
 	db.feedbacks.remove({})
 	session.clear()
 
@@ -537,6 +549,34 @@ def lazy():
 		db.feedbacks.update_one(identifications, {"$set": updates})
 
 	return str(i) + " registers updated."
+
+#################################### INDEX ####################################
+@app.route("/data")
+@app.route("/data/<search>")
+@app.route("/data/<search>/<gameType>")
+@app.route("/data/<search>/<gameType>/<position>")
+def data(search = None, gameType = 0, position = 0):
+	#gameType = 0 (all), 1, 2, 3, 4
+	#position = 0 (all), 1 (entity), 2 (category)
+    if session.get("user"):
+		identifications = dict()
+		identifications["user"] = session["user"]
+		if isUserOnline(identifications):
+			user = getUser(identifications)
+
+			#CODE HERE
+			if search != None:
+				identifications = dict();
+				if int(gameType) != 0:
+					identifications["gameType"] = int(gameType);
+				return "oi";
+					
+			else:
+				return render_template("data.html", _id = user["_id"], username = user["user"], status = 0);
+		else:
+			return redirect(url_for("login"))
+    else:
+	    return redirect(url_for("login"))
 
 #################################### ERROR ####################################
 @app.errorhandler(404)
