@@ -573,7 +573,7 @@ def data():
                                                cursor = db.feedbacks.find(identifications);
                                                for item in cursor:
                                                        retorno.append(item);
-                               return render_template("data.html", _id = user["_id"], username = user["user"], status = 1, data = reto
+                               return render_template("data.html", _id = user["_id"], username = user["user"], status = 1, data = retorno);
                        else:
                                return render_template("data.html", _id = user["_id"], username = user["user"], status = 0);
                else:
