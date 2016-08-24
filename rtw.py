@@ -13,17 +13,17 @@ import sys
 #initial identifications: entity, category
 #initial updates: score, count
 def addFeedback(identifications, updates, gameType):
-	updates["isInNell"] = ("score" in updates.keys() and "lazy" in updates.keys() and updates["score"] != -1 and not updates["lazy"])
+	updates["isInNell"] = ("score" in updates.keys() and "lazy" in updates.keys() and updates["score"] != -1 and not updates["lazy"]);
 	#cursor = mongo.db.feedbacks.find(identifications)
-	cursor = db.feedbacks.find(identifications)
+	cursor = db.feedbacks.find(identifications);
 	if cursor.count() > 0:
 		updates["count"] += cursor[0]["count"]
 		#mongo.db.feedbacks.update_one(identifications, {"$set": updates})
-		db.feedbacks.update_one(identifications, {"$set": updates})
+		db.feedbacks.update_one(identifications, {"$set": updates});
 	else:
 		updates["gameType"] = gameType
 		#mongo.db.feedbacks.insert_one(dict(identifications.items() + updates.items()))
-		db.feedbacks.insert_one(dict(identifications.items() + updates.items()))	
+		db.feedbacks.insert_one(dict(identifications.items() + updates.items()));
 
 def askNell(entity):
 	import json
