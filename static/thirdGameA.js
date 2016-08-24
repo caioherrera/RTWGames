@@ -38,6 +38,7 @@ function startGame(usuario, tema) {
 	document.getElementById("key1").readOnly = false;
 	document.getElementById("key2").readOnly = false;
 	document.getElementById("key3").readOnly = false;
+	document.getElementById("ok").disabled = false;
 	document.getElementById("key1").focus();
 
 //	startTimer(30, timer, usuario);
@@ -75,5 +76,6 @@ window.onload = function() {
 	document.getElementById("key1").value = "";
 	document.getElementById("key2").value = "";
 	document.getElementById("key3").value = "";
+	document.getElementById("ok").disabled = true;
 	document.getElementById("theme").value = "";
 }

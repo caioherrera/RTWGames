@@ -118,6 +118,8 @@ input[type="text"], input[type="email"], input[type="password"] {
 	border-radius: 6px;
 	transition: border 0.3s;
 	padding: 5px 10px 5px 10px;
+	margin: 10px;
+	margin-left: 0px;
 }
 
 input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
