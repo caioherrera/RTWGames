@@ -13,26 +13,41 @@
 					<li><a href="{{ url_for('index') }}">Home</a></li>
 					<li><a href="{{ url_for('overview') }}">Project Overview</a></li>
 					<li><a href="{{ url_for('people') }}">People</a></li>
-					{% if code == 0 %}
-					    {% block code0 %}
-					    	<li><a href="{{ url_for('login') }}">Login</a></li>
-					    	<li><a href="{{ url_for('register') }}">Register</a></li>
-					    {% endblock code0 %}
-					{% else %}
-						<li><a href="{{ url_for('games') }}">Games</a></li>
-						<li class="active"><a href="{{ url_for('profile') }}">Profile ({{ username }})</a></li>
-						<li><a href="{{ url_for('logout') }}">Logout</a></li>
-					{% endif %}
+					<li class="active"><a href="{{ url_for('games') }}">Games</a></li>
+					<li><a href="{{ url_for('profile') }}">Profile ({{ username }})</a></li>
+					<li><a href="{{ url_for('logout') }}">Logout</a></li>
 				</ul>
 			</nav>
 		</div>
 		<div id="body">
 			<h2>Data Search</h2>
-			<p><div class="formField">ID</div><input type="text" readonly="true" id="id" class="readOnly" value="{{ _id }}"></p>
-			<p><div class="formField">Username</div><input type="text" readonly="true" id="username" class="readOnly" value="{{ username }}"><p>
-			<p><div class="formField">Email</div><input type="text" readonly="true" id="email" class="readOnly" value="{{ email }}"><p>
-			<p><div class="formField">Score</div><input type="text" readonly="true" id="score" class="readOnly" value="{{ score }}"><p>
-			<p><div class="formField">Registration date</div><input type="text" readonly="true" id="regDate" class="readOnly" value="{{ regDate }}"><p><br>
+			<form method="POST">
+				<p><div class="formField">Word or expression</div><input type="text" id="search" name="search"></p>
+				<p><div class="formField">Game type</div>
+					<input type="radio" id="gameType" name="gameType" value="0" checked>All
+					<input type="radio" id="gameType" name="gameType" value="1">1
+					<input type="radio" id="gameType" name="gameType" value="2">2
+					<input type="radio" id="gameType" name="gameType" value="3">3<p>
+				<p><div class="formField">Search as</div>
+					<input type="radio" id="position" name="position" value="1">Entity
+					<input type="radio" id="position" name="position" value="2">Category
+					<input type="radio" id="position" name="position" value="0" checked>Both<p>
+				<p><div class="formField"><input type="submit" value="Search" id="submit"></div></p>
+			</form>
+			{% if status == 1%} 
+				{% block status1 %}
+					<hr><div>
+						{% for item in data %}
+							<p>
+								Entity: {{ item['entity'] }}<br>
+								Category: {{ item['category'] }}<br>
+								Score: {{ item['score'] }}<br>
+								Count: {{ item['count'] }}<br>
+							</p>
+						{% endfor %}
+					</div>
+				{% endblock status1 %}
+			{% endif %}
 			<div id="footer">
 				Caio Guimarães Herrera · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
 			</div>

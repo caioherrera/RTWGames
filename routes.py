@@ -551,11 +551,8 @@ def lazy():
 	return str(i) + " registers updated."
 
 #################################### INDEX ####################################
-@app.route("/data")
-@app.route("/data/<search>")
-@app.route("/data/<search>/<gameType>")
-@app.route("/data/<search>/<gameType>/<position>")
-def data(search = None, gameType = 0, position = 0):
+@app.route("/data", methods=["GET", "POST"])
+def data():
 	#gameType = 0 (all), 1, 2, 3, 4
 	#position = 0 (all), 1 (entity), 2 (category)
     if session.get("user"):
@@ -565,12 +562,30 @@ def data(search = None, gameType = 0, position = 0):
 			user = getUser(identifications)
 
 			#CODE HERE
-			if search != None:
+			if request.method == "POST":
+				search = request.form["search"];
+				gameType = request.form["gameType"];
+				position = request.form["position"];
+				retorno = list();
 				identifications = dict();
 				if int(gameType) != 0:
 					identifications["gameType"] = int(gameType);
-				return "oi";
-					
+				if int(position) in [0, 1]:
+					if len(search) > 0:
+						identifications["entity"] = search;
+					cursor = db.feedbacks.find(identifications);
+					for item in cursor:
+						retorno.append(item);
+				identifications = dict();
+				if int(gameType) != 0:
+					identifications["gameType"] = int(gameType);
+				if int(position) in [0, 2]:
+					if len(search) > 0:
+						identifications["category"] = search;
+						cursor = db.feedbacks.find(identifications);
+						for item in cursor:
+							retorno.append(item);
+				return render_template("data.html", _id = user["_id"], username = user["user"], status = 1, data = retorno);
 			else:
 				return render_template("data.html", _id = user["_id"], username = user["user"], status = 0);
 		else:

@@ -12,14 +12,12 @@ function testClick(e) {
 		value = document.getElementById("next").value;
 		newObject("guesses", value, true);
 		if(theme == value) {
-			document.getElementById("theme").readOnly = false;
-			document.getElementById("theme").value = "Correct answer!";
-			document.getElementById("theme").readOnly = true;
+			document.getElementById("theme").innerHTML = "Correct answer!";
 			endGame = true;
 			end();
 		}
 		else {
-			document.getElementById("theme").value = "Wrong answer!";
+			document.getElementById("theme").innerHTML = "Wrong answer!";
 		}
 		document.getElementById("next").value = "";
 		return false;
@@ -100,5 +98,5 @@ function startTimer(duration, display, username) {
 window.onload = function() {
 	document.getElementById("start").disabled = false;
 	document.getElementById("next").value = "";
-	document.getElementById("theme").value = "";
+	document.getElementById("theme").innerHTML = "";
 }
