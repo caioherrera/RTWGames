@@ -84,7 +84,8 @@ function startTimer(duration, display, username) {
 		display.textContent = "Time remaining: " + minutes + ":" + seconds;
 
 		if(timer % 5 == 0 && !endGame) {
-			nextHint();
+			if(timer > 0)
+				nextHint();
 			score -= 5;
 		}
 

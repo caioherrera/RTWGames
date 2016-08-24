@@ -130,9 +130,7 @@ def createGame(identifications):
 
 def saveGame(identifications):
 	_id = identifications["_id"];
-	print("salvando jogo de id " + str(_id), file=sys.stderr);
 	if _id in localGames.keys():
-		print("encontrou jogo localmente", file=sys.stderr);
 		db.games.update_one({"_id": _id}, {"$set": identifications});
 		return True;
 	return False;

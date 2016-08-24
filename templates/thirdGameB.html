@@ -1,6 +1,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
     {% if code == 0 or code == 3 %}
         <meta http-equiv="refresh" content="1;url={{ url_for('thirdGameB', game = game) }}">
     {% endif %}
@@ -8,69 +9,78 @@
 	<title>Third Game Part 2 - RTW :: Games</title>
 </head>
 <body>	
-	<h2>RTW :: Games</h2>
-	<h3>Research Project at Federal University of São Carlos</h3>
-	<a href="{{ url_for('index') }}">Home</a>
-	<a href="{{ url_for('overview') }}">Project Overview</a>
-	<a href="{{ url_for('people') }}">People</a>
-	<a href="{{ url_for('games') }}">Games</a>
-	(<a href="{{ url_for('profile') }}">{{ username }}</a>)
-    <a href="{{ url_for('logout') }}">Logout</a>
-	<hr>
-	<h3>Second Game</h3>
-    	{% if code == 1 %}
-        	{% block code1 %}
-            	<p>This game has been finished.</p>
-				<p>You scored {{ score }} points!</p>
-            {% endblock code1 %}
-        {% else %}
-            {% if code == 2 %}
-            	{% block code2 %}
-             		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}','{{ theme }}', '{{ data }}')"><br>
-                	<p>Guess the theme of the round!</p>
-                	<table>
-                		<tr>
-                			<td>
-                				<p>Next guess</p>
-                				<p><input type="text" readonly="true" id="next" onkeypress="return testClick(event);"></p>
-			                	<p><input type="text" readonly="true" id="theme"></p>
-                			</td>
-							<td width=50></td>
-                			<td>
-								<p>Previous guesses</p>
-                				<select size=5 readonly="true" id="guesses" width="100"></select>
-                			</td>
-							<td width=50></td>
-                			<td>
-								<p>Hints</p>
-                				<select size=5 readonly="true" id="hints" width="100"></select>
-                			</td>
-                		</tr>
-                	</table>
-					<form name="sendData" method="POST" action="/endGame">
-						<input type="hidden" id="number" name="number" value="4">
-						<input type="hidden" id="game" name="game" value="{{ game }}">
-						<input type="hidden" id="user" name="user" value="{{ _id }}">
-						<input type="hidden" id="data1" name="data1">
-						<input type="hidden" id="data2" name="data2">
-						<input type="hidden" id="count" name="count">
-						<input type="hidden" id="score" name="score">
-					</form>
-                	<p id="timer"></p>
-                {% endblock code2 %}
-            {% else %}
-				{% if code == 4 %}
-	            	{% block code4 %}
-    	             	<p>This game does not exist.</p>
-    	             {% endblock code4 %}
-				{% else %}
-					{% block code7 %}
-						<p>You can't play this game.</p>
-					{% endblock code7 %}
-				{% endif %}
-            {% endif %}
-        {% endif %}
-	<hr>
-	<strong>Caio Guimarães Herrera</strong> · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+	<div id="content">
+	    <div id="header">
+	        <h1>RTW :: Games<br><div id="subtitle">Research Project at Federal University of São Carlos</div></h1>
+            <nav>
+	            <ul>
+	                <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('overview') }}">Project Overview</a></li>
+                    <li><a href="{{ url_for('people') }}">People</a></li>
+                    <li class="active"><a href="{{ url_for('games') }}">Games</a></li>
+                    <li><a href="{{ url_for('profile') }}">Profile ({{ username }})</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+			</nav>
+		</div>
+        <div id="body">
+			<h2>Third Game</h2>
+		    	{% if code == 1 %}
+        			{% block code1 %}
+        		    	<p>This game has been finished.</p>
+						<p>You scored {{ score }} points!</p>
+        		    {% endblock code1 %}
+        		{% else %}
+        		    {% if code == 2 %}
+        		    	{% block code2 %}
+        		     		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}','{{ theme }}', '{{ data }}')"><br>
+        		        	<p>Guess the theme of the round!</p>
+        		        	<table>
+        		        		<tr>
+        		        			<td>
+										<p id="timer"></p>
+        		        				<p>Next guess</p>
+        		        				<p><input type="text" readonly="true" id="next" onkeypress="return testClick(event);"></p>
+					                	<p id="theme" class="themeCorrect">&nbsp;</p>
+        		        			</td>
+									<td width=50></td>
+        		        			<td>
+										<p>Previous guesses</p>
+        		        				<select size=5 readonly="true" id="guesses" width="100"></select>
+        		        			</td>
+									<td width=50></td>
+        		        			<td>
+										<p>Hints</p>
+            		    				<select size=5 readonly="true" id="hints" width="100"></select>
+            		    			</td>
+            		    		</tr>
+            		    	</table>
+							<form name="sendData" method="POST" action="/endGame">
+								<input type="hidden" id="number" name="number" value="4">
+								<input type="hidden" id="game" name="game" value="{{ game }}">
+								<input type="hidden" id="user" name="user" value="{{ _id }}">
+								<input type="hidden" id="data1" name="data1">
+								<input type="hidden" id="data2" name="data2">
+								<input type="hidden" id="count" name="count">
+								<input type="hidden" id="score" name="score">
+							</form>
+            		    {% endblock code2 %}
+            		{% else %}
+						{% if code == 4 %}
+	        		    	{% block code4 %}
+    	    		         	<p>This game does not exist.</p>
+    	    		         {% endblock code4 %}
+						{% else %}
+							{% block code7 %}
+								<p>You can't play this game.</p>
+							{% endblock code7 %}
+						{% endif %}
+            		{% endif %}
+		        {% endif %}
+            <div id="footer">
+	        	Caio Guimarães Herrera · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+            </div>
+         </div>
+    </div>
 </body>
 </html>
