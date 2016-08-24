@@ -100,8 +100,12 @@ pre {
 }
 
 .formField {
-	width: 150px;
+	min-width: 150px;
 	display: inline-block;
+}
+
+.json {
+	width: 150px;
 }
 
 .gameText {
@@ -133,7 +137,7 @@ input[type="submit"], input[type="button"] {
 	border-radius: 6px;
 	color: #FFFFFF;
 	padding: 5px;
-	width: 100px;
+	min-width: 100px;
 
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;

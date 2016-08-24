@@ -1,3 +1,9 @@
+{% if status == 1 %}
+	{% block status1 %}
+		<pre>{{ data }}</pre>
+	{% endblock status1 %}
+{% else %}
+	{% block otherStatus %}
 <html>
 <head>
 	<meta charset="utf-8">
@@ -32,22 +38,8 @@
 					<input type="radio" id="position" name="position" value="1">Entity
 					<input type="radio" id="position" name="position" value="2">Category
 					<input type="radio" id="position" name="position" value="0" checked>Both<p>
-				<p><div class="formField"><input type="submit" value="Search" id="submit"></div></p>
+				<p><div class="formField"><input class="json" type="submit" value="Generate JSON" id="submit"></div></p>
 			</form>
-			{% if status == 1%} 
-				{% block status1 %}
-					<hr><div>
-						{% for item in data %}
-							<p>
-								Entity: {{ item['entity'] }}
-								Category: {{ item['category'] }}
-								Score: {{ item['score'] }}
-								Count: {{ item['count'] }}
-							</p>
-						{% endfor %}
-					</div>
-				{% endblock status1 %}
-			{% endif %}
 			<div id="footer">
 				Caio Guimarães Herrera · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
 			</div>
@@ -55,4 +47,6 @@
 	</div>
 </body>
 </html>
+	{% endblock otherStatus %}
+{% endif %}
             

@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 from __future__ import print_function
+import json
 from flask import Flask, request, render_template, url_for, redirect, session
 from app import app, mongo, db
 from random import randint
@@ -541,45 +543,57 @@ def lazy():
 #################################### DATA ####################################
 @app.route("/data", methods=["GET", "POST"])
 def data():
-       #gameType = 0 (all), 1, 2, 3, 4
-       #position = 0 (all), 1 (entity), 2 (category)
-    if session.get("user"):
-               identifications = dict()
-               identifications["user"] = session["user"]
-               if isUserOnline(identifications):
-                       user = getUser(identifications)
-
-                       #CODE HERE
-                       if request.method == "POST":
-                               search = request.form["search"];
-                               gameType = request.form["gameType"];
-                               position = request.form["position"];
-                               retorno = list();
-                               identifications = dict();
-                               if int(gameType) != 0:
-                                       identifications["gameType"] = int(gameType);
-                               if int(position) in [0, 1]:
-                                       if len(search) > 0:
-                                               identifications["entity"] = search;
-                                       cursor = db.feedbacks.find(identifications);
-                                       for item in cursor:
-                                               retorno.append(item);
-                               identifications = dict();
-                               if int(gameType) != 0:
-                                       identifications["gameType"] = int(gameType);
-                               if int(position) in [0, 2]:
-                                       if len(search) > 0:
-                                               identifications["category"] = search;
-                                               cursor = db.feedbacks.find(identifications);
-                                               for item in cursor:
-                                                       retorno.append(item);
-                               return render_template("data.html", _id = user["_id"], username = user["user"], status = 1, data = retorno);
-                       else:
-                               return render_template("data.html", _id = user["_id"], username = user["user"], status = 0);
-               else:
-                       return redirect(url_for("login"))
-    else:
-           return redirect(url_for("login"))
+	if session.get("user"):
+		identifications = dict()
+		identifications["user"] = session["user"]
+		if isUserOnline(identifications):
+			user = getUser(identifications)
+			if request.method == "POST":
+				search = request.form["search"];
+				gameType = request.form["gameType"];
+				position = request.form["position"];
+				retorno = list();
+				identifications = dict();
+				if int(gameType) != 0:
+					identifications["gameType"] = int(gameType);
+				if int(position) in [0, 1]:
+					if len(search) > 0:
+						identifications["entity"] = search;
+					cursor = db.feedbacks.find(identifications);
+					for item in cursor:
+							jsonItem = dict();
+							jsonItem["category"] = item["category"];
+							jsonItem["entity"] = item["entity"];
+							jsonItem["count"] = item["count"];
+							jsonItem["gameType"] = item["gameType"];
+							jsonItem["isInNell"] = item["isInNell"];
+							jsonItem["score"] = item["score"];
+							jsonItem["lazy"] = item["lazy"];
+							retorno.append(jsonItem);
+				identifications = dict();
+				if int(gameType) != 0:
+					identifications["gameType"] = int(gameType);
+				if int(position) in [0, 2]:
+					if len(search) > 0:
+						identifications["category"] = search;
+						cursor = db.feedbacks.find(identifications);
+						for item in cursor:
+							jsonItem = dict();
+							jsonItem["category"] = item["category"];
+							jsonItem["entity"] = item["entity"];
+							jsonItem["count"] = item["count"];
+							jsonItem["gameType"] = item["gameType"];
+							jsonItem["isInNell"] = item["isInNell"];
+							jsonItem["score"] = item["score"];
+							jsonItem["lazy"] = item["lazy"];
+							retorno.append(jsonItem);
+				return render_template("data.html", _id = user["_id"], username = user["user"], status = 1, data = str(json.dumps(retorno, ensure_ascii=False, indent=1)));
+			else:
+				return render_template("data.html", _id = user["_id"], username = user["user"], status = 0);
+		else:
+			return redirect(url_for("login"))
+	else:
+		return redirect(url_for("login"))
 
 #################################### ERROR ####################################
 @app.errorhandler(404)
