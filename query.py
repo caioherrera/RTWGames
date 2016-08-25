@@ -30,6 +30,13 @@ import sys
 
 localGames = dict();
 
+def createSeed(identifications):
+	updates = dict();
+	updates["isInNell"], updates["score"] = existsInNell(identifications["entity"], identifications["category"]);
+	updates["lazy"] = False;
+	updates["count"] = 1;
+	addFeedback(identifications, updates, 0);		
+
 def subCategoryBelongsTo(identifications):
 	#cursor = mongo.db.subcategories.find(identifications)
 	cursor = db.subcategories.find(identifications)

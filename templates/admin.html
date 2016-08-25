@@ -24,20 +24,36 @@
 			<div id="seed">
 				<p><strong>Add a new seed</strong></p>
 				<form method="POST">
-						<input type="hidden" id="form" value=0>
+						<input type="hidden" id="form" name="form" value=0>
 			        	<p><div class="formField">Entity</div><input type="text" id="entity" name="entity"></p>
     	    			<p><div class="formField">Category</div><input type="text" id="category" name="category"></p>
 	    	    		<p><div class="formField"><input type="submit" value="Add" id="submit"></div></p>
-    	    	</form><br>
+    	    	</form>
+				{% if form1 == 1 %}
+					<p id="error">Seed successfully added.</p>
+				{% endif %}
+				<br>
 			</div>
 			<div id="admin">
 				<p><strong>Promote user to admin</strong></p>
 				<form method="POST">
-						<input type="hidden" id="form" value=1>
-			        	<p><div class="formField">Username</div><input type="text" id="entity" name="user"></p>
+						<input type="hidden" id="form" name="form" value=1>
+			        	<p><div class="formField">Username</div><input type="text" id="user" name="user"></p>
 			        	<p><div class="formField">Email</div><input type="email" id="email" name="email"></p>
 	    	    		<p><div class="formField"><input type="submit" value="Promote user" id="submit"></div></p>
-    	    	</form><br>
+    	    	</form>
+				{% if form2 == 1 %}
+					<p id="error">Username or email incorrect.</p>
+				{% else %}
+					{% if form2 == 2 %}
+						<p id="error">User is already an admin.</p>
+					{% else %}
+						{% if form2 == 3 %}
+							<p id="error">User successfully promoted.</p>
+						{% endif %}
+					{% endif %}	
+				{% endif %}
+				<br>
 			</div>
 			<div id="footer">
 				Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>

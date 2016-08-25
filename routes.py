@@ -24,14 +24,41 @@ def index():
 	    return render_template("index.html", code = 0, admin = False)
 
 #################################### ADMIN ####################################
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
 def admin():
 	if session.get("user"):
 		identifications = dict()
 		identifications["user"] = session["user"]
 		if isUserOnline(identifications):
 			if isUserAdmin(identifications):
-				return render_template("admin.html")
+				
+				if request.method == "POST":
+					form = int(request.form["form"]);
+					if form == 0:
+						#new seed				
+						identifications = dict();
+						identifications["entity"] = request.form["entity"];
+						identifications["category"] = request.form["category"];
+						createSeed(identifications);
+						return render_template("admin.html", username = session["user"], form1 = 1, form2 = 0);
+					else:
+						#new admin
+						identifications = dict();
+						identifications["user"] = request.form["user"];
+						identifications["email"] = request.form["email"];
+						newAdm = getUser(identifications);
+
+						if(newAdm == None):
+							return render_template("admin.html", username = session["user"], form1 = 0, form2 = 1);	
+						elif(newAdm["permission"] == 1):
+							return render_template("admin.html", username = session["user"], form1 = 0, form2 = 2);	
+						else:
+							updates = dict();
+							updates["permission"] = 1;
+							updateUser(identifications, updates);
+							return render_template("admin.html", username = session["user"], form1 = 0, form2 = 3);	
+				else:
+					return render_template("admin.html", username = session["user"], form1 = 0, form2 = 0);
 			else:
 				return redirect(url_for("index"))
 		else:
