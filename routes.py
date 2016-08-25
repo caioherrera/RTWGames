@@ -88,7 +88,7 @@ def login():
         return render_template("login.html", code = 0)
     elif request.method == "POST":
 		identifications = dict()
-		identifications["email"] = request.form["email"]
+		identifications["email"] = request.form["user"]
 		identifications["password"] = request.form["password"]
 		user = getUser(identifications)
 		if user != None:
@@ -96,7 +96,16 @@ def login():
 			session["user"] = user["user"]
 			return render_template("login.html", code = 1, username = user["user"], admin = isUserAdmin(identifications))
 		else:
-			return render_template("login.html", code = 2)
+			identifications = dict();
+			identifications["user"] = request.form["user"]
+			identifications["password"] = request.form["password"]
+			user = getUser(identifications)
+			if user != None:
+				changeUserStatus(identifications, True)		
+				session["user"] = user["user"]
+				return render_template("login.html", code = 1, username = user["user"], admin = isUserAdmin(identifications))
+			else:
+				return render_template("login.html", code = 2)
 
 
 #################################### REGISTER ####################################
