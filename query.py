@@ -50,6 +50,12 @@ def subCategoryBelongsTo(identifications):
 		return None
 	return None
 
+def getCategory(identifications):
+	cursor = db.categories.find(identifications)
+	if cursor.count() > 0:
+		return cursor[0]
+	return None
+
 def pickRandomCategory():
 	#cursor = mongo.db.categories.find({})
 	cursor = db.categories.find({})
@@ -229,7 +235,8 @@ def finishGame(identifications):
 			subIdentifications = dict()
 			subIdentifications["name"] = str(localGames[_id]["theme"])
 			if int(localGames[_id]["gameType"]) == 1:
-				category = subCategoryBelongsTo(subIdentifications)
+				#category = subCategoryBelongsTo(subIdentifications)
+				category = getCategory(subIdentifications);
 				if category == None: 
 					return False
 			elif int(localGames[_id]["gameType"]) == 2:
