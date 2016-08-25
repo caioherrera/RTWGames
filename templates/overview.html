@@ -18,6 +18,7 @@
 					    	<li><a href="{{ url_for('register') }}">Register</a></li>
 					    {% endblock code0 %}
 					{% else %}
+						<li><a href="{{ url_for('data') }}">Data Search</a></li>
 						<li><a href="{{ url_for('games') }}">Games</a></li>
 						{% if admin %}					
 							<li><a href="{{ url_for('admin') }}">Admin options</a></li>

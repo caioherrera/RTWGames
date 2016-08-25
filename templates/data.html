@@ -18,7 +18,8 @@
 				<ul>
 					<li><a href="{{ url_for('index') }}">Home</a></li>
 					<li><a href="{{ url_for('overview') }}">Project Overview</a></li>
-					<li class="active"><a href="{{ url_for('games') }}">Games</a></li>
+					<li class="active"><a href="{{ url_for('data') }}">Data Search</a></li>
+					<li><a href="{{ url_for('games') }}">Games</a></li>
 					{% if admin %}					
 						<li><a href="{{ url_for('admin') }}">Admin options</a></li>
 					{% endif %}
