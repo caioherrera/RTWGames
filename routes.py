@@ -94,21 +94,6 @@ def overview():
     else:
 	    return render_template("overview.html", code = 0)
 
-
-#################################### PEOPLE ####################################
-@app.route("/people")
-def people():
-    if session.get("user"):
-		identifications = dict()
-		identifications["user"] = session["user"]
-		if isUserOnline(identifications):
-			return render_template("people.html", code = 1, username = session["user"])
-		else:
-			return redirect(url_for("login"))
-    else:
-	    return render_template("people.html", code = 0)
-
-
 #################################### LOGOUT ####################################
 @app.route("/logout")
 def logout():

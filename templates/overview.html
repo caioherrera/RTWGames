@@ -12,7 +12,6 @@
 				<ul>
 					<li><a href="{{ url_for('index') }}">Home</a></li>
 					<li class="active"><a href="{{ url_for('overview') }}">Project Overview</a></li>
-					<li><a href="{{ url_for('people') }}">People</a></li>
 					{% if code == 0 %}
 					    {% block code0 %}
 					    	<li><a href="{{ url_for('login') }}">Login</a></li>
@@ -28,10 +27,12 @@
 		</div>
 		<div id="body">
 			<h2>Project Overview</h2>
-			<p>The <strong>main goal</strong> of this project is to expand the knowledge base of the computer system called <strong>Never-Ending Language Learner</strong> (NeLL), created as a research project at <strong>Carnegie Mellon University</strong>, allowing users to interact with the knowledge base, through an approach known as <strong>Games with a Purpose</strong>, explored by <strong>Luis von Ahn</strong>. Through a few games, users provide NeLL a wide range of candidates for <strong>entities and categories</strong>. After that, <strong>machine learning algorithms</strong> will be applied on the collected data, in order to directly improve the <strong>ontology</strong> and <strong>knowledge base</strong> of NeLL.<br></p>
-			<p>Click <a href="http://rtw.ml.cmu.edu/rtw/">here</a> to learn more about the NeLL project.</p><br>
+			<p class='bruteText'>The main goal of this project is to expand the knowledge base of the computer system called Never-Ending Language Learner (NeLL), created as a research project at Carnegie Mellon University, allowing users to interact with the knowledge base, through an approach known as Games with a Purpose, explored by Luis von Ahn. Through a few games, users provide NeLL a wide range of candidates for entities and categories. After that, machine learning algorithms will be applied on the collected data, in order to directly improve the ontology and knowledge base of NeLL.</p>
+			<p class='bruteText'>Click <a class="underlineLink" href="http://rtw.ml.cmu.edu/rtw/">here</a> to learn more about the NeLL project.</p>
+			<p class='bruteText'>Until now, it is possible to access the data collected with this project using the /data page, where the user can filter parameters like the expression they are looking for, if it occurs as an entity or a category, and from which game the feedback came from. The generated data is presented in JSON format, so it's easier to understand and manipulate.</p>
+			<p class='bruteText'>The future updates of this project will be mentioned here.</p>
 			<div id="footer">
-				Caio Guimarães Herrera · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+				Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
 			</div>
 		</div>
 	</div>
