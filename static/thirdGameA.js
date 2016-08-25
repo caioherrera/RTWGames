@@ -12,15 +12,15 @@ function testClick(e, number) {
 function newObject(number) {
 	var txt = "";
 	if(number == 1) {
-		txt = document.getElementById("key1").value;
+		txt = document.getElementById("key1").value.toLowerCase();
 		document.getElementById("key2").focus();
 	}
 	else if(number == 2) {
-		txt = document.getElementById("key2").value;
+		txt = document.getElementById("key2").value.toLowerCase();
 		document.getElementById("key3").focus();
 	}
 	else {
-		txt = document.getElementById("key3").value;
+		txt = document.getElementById("key3").value.toLowerCase();
 		document.getElementById("ok").focus();
 	}
 	if(objects != "")
@@ -33,7 +33,7 @@ function startGame(usuario, tema) {
 	document.getElementById("start").disabled = true;
 	
 	theme = document.getElementById("theme");
-	theme.value = tema;
+	theme.value = tema.toLowerCase();
 
 	document.getElementById("key1").readOnly = false;
 	document.getElementById("key2").readOnly = false;

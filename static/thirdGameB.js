@@ -9,7 +9,7 @@ var endGame = false;
 function testClick(e) {
 	e = e || window.event;
 	if(e.keyCode == 13) {
-		value = document.getElementById("next").value;
+		value = document.getElementById("next").value.toLowerCase();
 		newObject("guesses", value, true);
 		if(theme == value) {
 			document.getElementById("theme").innerHTML = "Correct answer!";
@@ -29,7 +29,7 @@ function newObject(name, value, save) {
 	select = document.getElementById(name);
 	select.readOnly = false;
 	var op = document.createElement("option");
-	var obj = value;
+	var obj = value.toLowerCase();
 	op.text = obj;
 	if(save) {
 		if(data1 != "")
@@ -45,9 +45,9 @@ function startGame(usuario, tema, dados) {
 	timer = document.getElementById("timer");
 	document.getElementById("start").disabled = true;
 	
-	theme = tema;
-	data2 = dados;
-	data = dados.split("||");
+	theme = tema.toLowerCase();
+	data2 = dados.toLowerCase();
+	data = dados.toLowerCase().split("||");
 
 	next = document.getElementById("next");
 	next.readOnly = false;
@@ -65,8 +65,8 @@ function end() {
 	next = document.getElementById("next");
 	next.value = "";
 	next.readOnly = true;
-	document.getElementById("data1").value = data1;
-	document.getElementById("data2").value = data2;
+	document.getElementById("data1").value = data1.toLowerCase();
+	document.getElementById("data2").value = data2.toLowerCase();
 	document.getElementById("count").value = count;
 	document.getElementById("score").value = score;
 

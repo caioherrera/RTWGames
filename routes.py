@@ -191,7 +191,7 @@ def firstGame(game = None):
 					#identifications["category"] = category["_id"]
 					#subCategory = pickRandomSubCategory(identifications)
 					#theme = subCategory["name"]
-					theme = category["name"]
+					theme = category["name"][0]
 					identifications = dict()
 					identifications["gameType"] = 1
 					identifications["theme"] = theme
@@ -252,7 +252,9 @@ def secondGame(game = None):
 			if game == None:
 				identifications = dict()
 				category = pickRandomCategory()
-				theme = category["name"]
+				themes = category["name"]
+				theme = themes[0]
+				strThemes = "||".join(themes) + "||"
 				identifications["gameType"] = 2
 				identifications["theme"] = theme
 				game = createGame(identifications)
@@ -279,13 +281,13 @@ def secondGame(game = None):
 				updates["data2"] = data2
 				updateGame(identifications, updates)
 				startGame(identifications)
-				return render_template("secondGame.html", username = user["user"], code = 2, theme = theme, game = str(game), _id = str(user["_id"]), data = data2, admin = isUserAdmin({"user": session["user"]}))
+				return render_template("secondGame.html", username = user["user"], code = 2, themes = strThemes, game = str(game), _id = str(user["_id"]), data = data2, admin = isUserAdmin({"user": session["user"]}))
 			else:
 				idGame = -1
 				theme = ""
 				status = 4
 				if len(game) != 24:
-					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+					return render_template("secondGame.html", username = user["user"], code = status, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
 				identifications = dict()
 				identifications["_id"] = ObjectId(game)
 				game = getGame(identifications)
@@ -295,11 +297,11 @@ def secondGame(game = None):
 					idGame = game["_id"]
 				if status == 1:
 					if user["_id"] == userFromGame(identifications, 1):
-						return render_template("secondGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]), admin = isUserAdmin({"user": session["user"]}))
+						return render_template("secondGame.html", username = user["user"], code = 10, game = idGame, _id = str(user["_id"]), score = int(game["score1"]), admin = isUserAdmin({"user": session["user"]}))
 					else:
-						return render_template("secondGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+						return render_template("secondGame.html", username = user["user"], code = 1, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
 				else:
-					return render_template("secondGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+					return render_template("secondGame.html", username = user["user"], code = status, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
 		else:
 			return redirect(url_for("login"))
 	else:
@@ -322,7 +324,7 @@ def thirdGameA(game = None):
 		
 					category = pickRandomCategory()
 					dataId = dict()
-					dataId["category"] = category["name"]
+					dataId["category"] = category["name"][0]
 					sortCriteria = [("score", 1)]
 					maxValues = 10
 					theme1 = pickRandomFeedback(dataId, sortCriteria, maxValues)
@@ -468,6 +470,7 @@ def endGame():
 	if number == 1:
 		return redirect(url_for("firstGame", game = str(identifications["_id"])))
 	elif number == 2:
+		#print("retornando pro jogo 2", file=sys.stderr);
 		return redirect(url_for("secondGame", game = str(identifications["_id"])))
 	elif number == 3: 
 		return redirect(url_for("thirdGameA", game = str(identifications["_id"])))

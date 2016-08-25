@@ -38,14 +38,14 @@
 		        {% else %}
 		            {% if code == 2 %}
 		            	{% block code2 %}
-		             		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}','{{ theme }}', '{{ data }}')"><br>
+		             		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}', '{{ themes }}', '{{ data }}')"><br>
 		                	<p>Guess the theme of the round!</p>
 		                	<table>
 		                		<tr>
 		                			<td>
 					                	<p id="timer"></p>
 		                				<p>Next guess</p>
-		                				<p><input type="text" readonly="true" id="next" onkeypress="return testClick(event);"></p>
+		                				<p><input type="text" readonly="true" id="next" onKeyPress="return testClick(event)"></p>
 					                	<p id="theme" class="themeCorrect">&nbsp;</p>
 		                			</td>
 									<td width=50></td>

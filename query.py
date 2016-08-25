@@ -146,13 +146,16 @@ def createGame(identifications):
 	return _id.inserted_id
 
 def saveGame(identifications):
+	#print("saveGame", file=sys.stderr);
 	_id = identifications["_id"];
 	if _id in localGames.keys():
-		db.games.update_one({"_id": _id}, {"$set": identifications});
+		#print("salvando o jogo", file=sys.stderr);
+		db.games.update_one({"_id": _id}, {"$set": localGames[_id]});
 		return True;
 	return False;
 
 def updateGame(identifications, updates):
+	#print("updateGame", file=sys.stderr);
 	_id = identifications["_id"];
 	if _id in localGames.keys():
 		for key in updates.keys():
@@ -227,9 +230,6 @@ def finishGame(identifications):
 
 	_id = identifications["_id"];
 	if _id in localGames.keys():
-
-	#cursor = db.games.find(identifications)
-	#if cursor.count() > 0:
 		if localGames[_id]["data1"] != None and localGames[_id]["data2"] != None and not localGames[_id]["finished"]:
 			updateGame(identifications, {"finished": True})
 			subIdentifications = dict()
@@ -251,7 +251,7 @@ def finishGame(identifications):
 			gameType = int(localGames[_id]["gameType"])
 			updates = dict()
 			if gameType == 1:
-				score1, score2 = calculateScores(data1, data2, category["name"], 1)
+				score1, score2 = calculateScores(data1, data2, category["name"][0], 1)
 				updates["score1"] = score1
 				idUser = dict()
 				idUser["_id"] = localGames[_id]["user1"]
@@ -329,6 +329,7 @@ def finishGame(identifications):
 			finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			updates["status"] = 1
 			updates["finish"] = finish
+			#print("finalizando o jogo", file=sys.stderr);
 			return updateGame(identifications, updates) and saveGame(identifications);
 		else:
 			updates = dict()

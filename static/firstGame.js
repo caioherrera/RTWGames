@@ -13,7 +13,7 @@ function newObject() {
 	select = document.getElementById("list");
 	select.readOnly = false;
 	var op = document.createElement("option");
-	var obj = document.getElementById("next").value;
+	var obj = document.getElementById("next").value.toLowerCase();
 	op.text = obj;
 	if(objects != "")
 		objects += "||";
@@ -29,7 +29,7 @@ function startGame(usuario, tema) {
 	document.getElementById("start").disabled = true;
 	
 	theme = document.getElementById("theme");
-	theme.value = tema;
+	theme.value = tema.toLowerCase();
 
 	next = document.getElementById("next");
 	next.readOnly = false;

@@ -1,5 +1,5 @@
 var data1 = "";
-var theme = "";
+var themes = [];
 var data2 = "";
 var data = [];
 var count = 0;
@@ -7,11 +7,10 @@ var score = 35;
 var endGame = false;
 
 function testClick(e) {
-	e = e || window.event;
-	if(e.keyCode == 13) {
-		value = document.getElementById("next").value;
+	if(e.which == 13) {
+		value = document.getElementById("next").value.toLowerCase();
 		newObject("guesses", value, true);
-		if(theme == value) {
+		if(themes.indexOf(value) != -1) {
 			document.getElementById("theme").innerHTML = "Correct answer!";
 			endGame = true;
 			end();
@@ -41,13 +40,13 @@ function newObject(name, value, save) {
 	select.readOnly = true;
 }
 
-function startGame(usuario, tema, dados) {
+function startGame(usuario, temas, dados) {
 	timer = document.getElementById("timer");
 	document.getElementById("start").disabled = true;
-	
-	theme = tema;
-	data2 = dados;
-	data = dados.split("||");
+
+	themes = temas.toLowerCase().split("||");
+	data2 = dados.toLowerCase();
+	data = dados.toLowerCase().split("||");
 
 	next = document.getElementById("next");
 	next.readOnly = false;
