@@ -1,0 +1,44 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
+	<title>Profile - RTW :: Games</title>
+</head>
+<body>
+	<div id="content">
+		<div id="header">
+			<h1>RTW :: Games<br><div id="subtitle">Research Project at Federal University of São Carlos</div></h1>
+			<nav>
+				<ul>
+					<li><a href="{{ url_for('index') }}">Home</a></li>
+					<li><a href="{{ url_for('overview') }}">Project Overview</a></li>
+					{% if code == 0 %}
+					    {% block code0 %}
+					    	<li><a href="{{ url_for('login') }}">Login</a></li>
+					    	<li><a href="{{ url_for('register') }}">Register</a></li>
+					    {% endblock code0 %}
+					{% else %}
+						<li><a href="{{ url_for('games') }}">Games</a></li>
+						{% if admin %}					
+							<li><a href="{{ url_for('admin') }}">Admin options</a></li>
+						{% endif %}
+						<li class="active"><a href="{{ url_for('profile') }}">Profile ({{ username }})</a></li>
+						<li><a href="{{ url_for('logout') }}">Logout</a></li>
+					{% endif %}
+				</ul>
+			</nav>
+		</div>
+		<div id="body">
+			<h2>Profile</h2>
+			<p><div class="formField">ID</div><input type="text" readonly="true" id="id" class="readOnly" value="{{ _id }}"></p>
+			<p><div class="formField">Username</div><input type="text" readonly="true" id="username" class="readOnly" value="{{ username }}"><p>
+			<p><div class="formField">Email</div><input type="text" readonly="true" id="email" class="readOnly" value="{{ email }}"><p>
+			<p><div class="formField">Score</div><input type="text" readonly="true" id="score" class="readOnly" value="{{ score }}"><p>
+			<p><div class="formField">Registration date</div><input type="text" readonly="true" id="regDate" class="readOnly" value="{{ regDate }}"><p><br>
+			<div id="footer">
+				Caio Guimarães Herrera · <a href="https://github.com/caioherrera">Github</a> · <a href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a href="mailto:caio.herrera@outlook.com">E-mail</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

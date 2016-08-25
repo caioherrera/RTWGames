@@ -1,0 +1,48 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
+	<title>Games - RTW :: Games</title>
+</head>
+<body>
+	<div id="content">
+		<div id="header">
+			<h1>RTW :: Games<br><div id="subtitle">Research Project at Federal University of São Carlos</div></h1>
+			<nav>
+				<ul>
+					<li><a href="{{ url_for('index') }}">Home</a></li>
+					<li><a href="{{ url_for('overview') }}">Project Overview</a></li>
+					<li><a href="{{ url_for('games') }}">Games</a></li>
+					<li class="active"><a href="{{ url_for('admin') }}">Admin options</a></li>
+					<li><a href="{{ url_for('profile') }}">Profile ({{ username }})</a></li>
+					<li><a href="{{ url_for('logout') }}">Logout</a></li>
+				</ul>
+			</nav>
+		</div>
+		<div id="body">
+			<h2>Admin options</h2>
+			<div id="seed">
+				<p><strong>Add a new seed</strong></p>
+				<form method="POST">
+						<input type="hidden" id="form" value=0>
+			        	<p><div class="formField">Entity</div><input type="text" id="entity" name="entity"></p>
+    	    			<p><div class="formField">Category</div><input type="text" id="category" name="category"></p>
+	    	    		<p><div class="formField"><input type="submit" value="Add" id="submit"></div></p>
+    	    	</form><br>
+			</div>
+			<div id="admin">
+				<p><strong>Promote user to admin</strong></p>
+				<form method="POST">
+						<input type="hidden" id="form" value=1>
+			        	<p><div class="formField">Username</div><input type="text" id="entity" name="user"></p>
+			        	<p><div class="formField">Email</div><input type="email" id="email" name="email"></p>
+	    	    		<p><div class="formField"><input type="submit" value="Promote user" id="submit"></div></p>
+    	    	</form><br>
+			</div>
+			<div id="footer">
+				Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -84,6 +84,10 @@ def getUser(identifications):
 		return cursor[0]
 	return None
 
+def isUserAdmin(identifications):
+	user = getUser(identifications)
+	return user != None and user["permission"] == 1
+
 def isUserOnline(identifications):
 	user = getUser(identifications)
 	return user != None and user["online"]
