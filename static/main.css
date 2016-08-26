@@ -120,6 +120,12 @@ pre {
 	font-size: 14px;
 }
 
+input[type="number"] {
+	padding: 5px 10px 5px 10px;
+	width: 150px;
+	margin-left: 10px;
+}
+
 input[type="text"], input[type="email"], input[type="password"] {
 	border: solid 1px #00186F;
 	border-bottom-width: 3px;

@@ -575,7 +575,7 @@ def lazy():
 		updates["lazy"] = False
 		exists, score = existsInNell(c["entity"], c["category"])
 		if not exists:
-			score = -1
+			score = 0.0
 		updates["isInNell"] = exists
 		updates["score"] = score
 		#mongo.db.feedbacks.update_one(identifications, {"$set": updates})
@@ -590,53 +590,63 @@ def data():
 		identifications = dict()
 		identifications["user"] = session["user"]
 		if isUserOnline(identifications):
-			user = getUser(identifications)
-			if request.method == "POST":
-				search = request.form["search"];
-				gameType = request.form["gameType"];
-				position = request.form["position"];
-				retorno = list();
-				identifications = dict();
-				if int(gameType) != 0:
-					identifications["gameType"] = int(gameType);
-				if int(position) in [0, 1]:
-					if len(search) > 0:
-						identifications["entity"] = search;
-					cursor = db.feedbacks.find(identifications);
-					for item in cursor:
-							jsonItem = dict();
-							jsonItem["category"] = item["category"];
-							jsonItem["entity"] = item["entity"];
-							jsonItem["count"] = item["count"];
-							jsonItem["gameType"] = item["gameType"];
-							jsonItem["isInNell"] = item["isInNell"];
-							jsonItem["score"] = item["score"];
-							jsonItem["lazy"] = item["lazy"];
-							retorno.append(jsonItem);
-				identifications = dict();
-				if int(gameType) != 0:
-					identifications["gameType"] = int(gameType);
-				if int(position) in [0, 2]:
-					if len(search) > 0:
-						identifications["category"] = search;
-						cursor = db.feedbacks.find(identifications);
-						for item in cursor:
-							jsonItem = dict();
-							jsonItem["category"] = item["category"];
-							jsonItem["entity"] = item["entity"];
-							jsonItem["count"] = item["count"];
-							jsonItem["gameType"] = item["gameType"];
-							jsonItem["isInNell"] = item["isInNell"];
-							jsonItem["score"] = item["score"];
-							jsonItem["lazy"] = item["lazy"];
-							retorno.append(jsonItem);
-				return render_template("data.html", _id = user["_id"], username = user["user"], status = 1, data = str(json.dumps(retorno, ensure_ascii=False, indent=1)), admin = isUserAdmin({"user": session["user"]}));
-			else:
-				return render_template("data.html", _id = user["_id"], username = user["user"], status = 0, admin = isUserAdmin({"user": session["user"]}));
+			return render_template("data.html", username = session["user"], admin = isUserAdmin({"user": session["user"]}));
 		else:
 			return redirect(url_for("login"))
 	else:
 		return redirect(url_for("login"))
+
+#################################### GENERATE DATA ####################################
+@app.route("/generateData", methods=["GET"])
+def generateData():
+	search = request.args["search"];
+	gameType = int(request.args["gameType"]);
+	position = int(request.args["position"]);
+	count = int(request.args["count"]);
+	score = float(request.args["score"]);
+
+	queryReturn = list();
+	identifications = dict();
+	if gameType != 4:
+		identifications["gameType"] = gameType;
+	if position in [0, 1]:
+		if len(search) > 0:
+			identifications["entity"] = search;
+		identifications["count"] = { "$gte": count };
+		identifications["score"] = { "$gte": score };
+		cursor = db.feedbacks.find(identifications);
+		for item in cursor:
+			jsonItem = dict();
+			jsonItem["category"] = item["category"];
+			jsonItem["entity"] = item["entity"];
+			jsonItem["count"] = item["count"];
+			jsonItem["gameType"] = item["gameType"];
+			jsonItem["isInNell"] = item["isInNell"];
+			jsonItem["score"] = item["score"];
+			jsonItem["lazy"] = item["lazy"];
+			queryReturn.append(jsonItem);
+
+	identifications = dict();
+	if gameType != 4:
+		identifications["gameType"] = gameType;
+	if position in [0, 2]:
+		if len(search) > 0:
+			identifications["category"] = search;
+		identifications["count"] = { "$gte": count };
+		identifications["score"] = { "$gte": score };
+		cursor = db.feedbacks.find(identifications);
+		for item in cursor:
+			jsonItem = dict();
+			jsonItem["category"] = item["category"];
+			jsonItem["entity"] = item["entity"];
+			jsonItem["count"] = item["count"];
+			jsonItem["gameType"] = item["gameType"];
+			jsonItem["isInNell"] = item["isInNell"];
+			jsonItem["score"] = item["score"];
+			jsonItem["lazy"] = item["lazy"];
+			queryReturn.append(jsonItem);
+
+	return "<pre>" + str(json.dumps(queryReturn, ensure_ascii=False, indent=1)) + "</pre>";
 
 #################################### ERROR ####################################
 @app.errorhandler(404)

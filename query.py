@@ -269,7 +269,7 @@ def finishGame(identifications):
 					for category in data1:
 						entity = data2[i]
 						#exists, score = existsInNell(entity, category)
-						exists, score = None, -1
+						exists, score = None, 0.0
 						fbIdent = dict()
 						fbUpdates = dict()
 						fbIdent["entity"] = entity
@@ -289,7 +289,7 @@ def finishGame(identifications):
 				for category in data1:
 					entity = subIdentifications["name"].split("||")[0]					
 					#exists, score = existsInNell(entity, category)
-					exists, score = None, -1
+					exists, score = None, 0.0
 					fbIdent, fbUpdates = dict(), dict()
 					fbIdent["entity"] = entity
 					fbIdent["category"] = category
@@ -300,7 +300,7 @@ def finishGame(identifications):
 				for category in data2:
 					entity = subIdentifications["name"].split("||")[1]					
 					#exists, score = existsInNell(entity, category)
-					exists, score = None, -1
+					exists, score = None, 0.0
 					fbIdent, fbUpdates = dict(), dict()
 					fbIdent["entity"] = entity
 					fbIdent["category"] = category
@@ -317,7 +317,7 @@ def finishGame(identifications):
 					for entity in data1:
 						category = data2[i]
 						#exists, score = existsInNell(entity, category)
-						exists, score = None, -1
+						exists, score = None, 0.0
 						fbIdent = dict()
 						fbUpdates = dict()
 						fbIdent["entity"] = entity

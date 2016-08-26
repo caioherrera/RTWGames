@@ -13,7 +13,7 @@ import sys
 #initial identifications: entity, category
 #initial updates: score, count
 def addFeedback(identifications, updates, gameType):
-	updates["isInNell"] = ("score" in updates.keys() and "lazy" in updates.keys() and updates["score"] != -1 and not updates["lazy"]);
+	updates["isInNell"] = ("score" in updates.keys() and "lazy" in updates.keys() and updates["score"] != 0.0 and not updates["lazy"]);
 	#cursor = mongo.db.feedbacks.find(identifications)
 	cursor = db.feedbacks.find(identifications);
 	if cursor.count() > 0:
@@ -44,7 +44,7 @@ def existsInNell(entity, category):
 	for o in occurrences:
 		if str(o[0]) == category:
 			return True, float(o[1])
-	return False, -1
+	return False, 0.0
 
 def calculateScores(player1, player2, category, gameType):
 	if gameType == 1:
@@ -78,7 +78,7 @@ def calculateScores(player1, player2, category, gameType):
 							updates["count"] = 1
 							score1 += 7
 				else:
-					updates["score"] = -1
+					updates["score"] = 0.0
 					if e in player2:
 						updates["count"] = 2
 						score1 += 15
@@ -105,7 +105,7 @@ def calculateScores(player1, player2, category, gameType):
 					else:
 						score2 += 7
 				else:
-					updates["score"] = -1
+					updates["score"] = 0.0
 					score2 += 2
 				addFeedback(identifications, updates, gameType)
 
