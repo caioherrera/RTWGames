@@ -482,7 +482,7 @@ def endGame():
 		return render_template("thirdGameB.html", username = user["user"], code = 1, score = updates["score1"], game = str(identifications["_id"]), _id = user["_id"], admin = isUserAdmin({"user": session["user"]}))
 
 
-#################################### UPDATE ####################################
+'''#################################### UPDATE ####################################
 @app.route("/update")
 def update():
 
@@ -510,7 +510,7 @@ def update():
 	db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})
 
 
-	'''mongo.db.feedbacks.remove({})
+	mongo.db.feedbacks.remove({})
 	mongo.db.games.remove({})
 	mongo.db.subcategories.remove({})
 	mongo.db.categories.remove({})
@@ -531,7 +531,7 @@ def update():
 	mongo.db.categories.insert_one({"name": "musicsong"})
 	cursor = mongo.db.categories.find({"name": "musicsong"})
 	mongo.db.subcategories.insert_one({"name": "Heavy Metal musics", "category": cursor[0]["_id"]})
-	mongo.db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})'''
+	mongo.db.subcategories.insert_one({"name": "Rock musics", "category": cursor[0]["_id"]})
 
 	#mongo.db.games.remove({"gameType": 3})
 	#mongo.db.games.remove({"gameType": 4})
@@ -560,7 +560,7 @@ def update():
 		string += "Score: " + str(c["score"]) + "<br>"
 		string += "Lazy: " + str(c["lazy"]) + "</p>"
 
-	return string
+	return string'''
 
 #################################### LAZY ####################################
 @app.route("/lazy")
