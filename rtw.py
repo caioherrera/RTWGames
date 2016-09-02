@@ -7,7 +7,7 @@ import sys
 #calculateScores(data1, data2, category, gameType): int, int
 #askNell(entity): list
 #existsInNell(entity, category): tuple(bool, float)
-#generateData(identifications, uniqueKey, sortCriteria, maxValues): list
+#getData(identifications, uniqueKey, sortCriteria, maxValues): list
 #pickRandomFeedback(identifications, sortCriteria, maxValues): dict
 
 #initial identifications: entity, category
@@ -112,7 +112,7 @@ def calculateScores(player1, player2, category, gameType):
 		return score1, score2
 	return -1, -1
 
-def generateData(identifications, sortCriteria, maxValues):
+def getData(identifications, sortCriteria, maxValues):
 	#cursor = mongo.db.feedbacks.find(identifications).sort(sortCriteria)
 	cursor = db.feedbacks.find(identifications).sort(sortCriteria)
 	data = []
@@ -122,7 +122,7 @@ def generateData(identifications, sortCriteria, maxValues):
 	return data
 
 def pickRandomFeedback(identifications, sortCriteria, maxValues):
-	data = generateData(identifications, sortCriteria, maxValues)
+	data = getData(identifications, sortCriteria, maxValues)
 	rand = randint(0, len(data) - 1)
 	return data[rand]
 

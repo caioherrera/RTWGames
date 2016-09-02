@@ -271,7 +271,7 @@ def secondGame(game = None):
 
 				data2 = str()
 				first = True				
-				for i in generateData(dataId, sortCriteria, maxValues):
+				for i in getData(dataId, sortCriteria, maxValues):
 					if not first:
 						data2 += "||"
 					first = False
