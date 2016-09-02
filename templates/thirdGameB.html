@@ -19,9 +19,9 @@
 					<li><a href="{{ url_for('data') }}">Data Search</a></li>
                     <li class="active"><a href="{{ url_for('games') }}">Games</a></li>
 					{% if admin %}					
-						<li><a href="{{ url_for('admin') }}">Admin options</a></li>
+						<li><a href="{{ url_for('admin') }}">Admin Options</a></li>
 					{% endif %}
-                    <li><a href="{{ url_for('profile') }}">Profile ({{ username }})</a></li>
+                    <li><a href="{{ url_for('profile') }}">My Profile</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 </ul>
 			</nav>
