@@ -11,21 +11,12 @@ function testClick(e, number) {
 
 function newObject(number) {
 	var txt = "";
-	if(number == 1) {
-		txt = document.getElementById("key1").value.toLowerCase();
+	if(number == 1)
 		document.getElementById("key2").focus();
-	}
-	else if(number == 2) {
-		txt = document.getElementById("key2").value.toLowerCase();
+	else if(number == 2)
 		document.getElementById("key3").focus();
-	}
-	else {
-		txt = document.getElementById("key3").value.toLowerCase();
+	else
 		document.getElementById("ok").focus();
-	}
-	if(objects != "")
-		objects += "||";
-	objects += txt;
 }
 
 function startGame(usuario, tema) {
@@ -45,6 +36,18 @@ function startGame(usuario, tema) {
 }
 
 function sendForm() {
+
+	var txt1 = document.getElementById("key1").value.toLowerCase();
+	var txt2 = document.getElementById("key2").value.toLowerCase();
+	var txt3 = document.getElementById("key3").value.toLowerCase();
+
+	if(txt1 != "") objects += txt1;
+	if(objects != "") object += "||";	
+	if(txt2 != "") objects += txt2;
+	if(objects != "") object += "||";	
+	if(txt3 != "") objects += txt3;
+	if(objects != "") object += "||";	
+
 	document.getElementById("data").value = objects;
 	document.forms["sendData"].submit();
 }
