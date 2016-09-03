@@ -37,16 +37,26 @@ function startGame(usuario, tema) {
 
 function sendForm() {
 
+	objects = "";
+
 	var txt1 = document.getElementById("key1").value.toLowerCase();
 	var txt2 = document.getElementById("key2").value.toLowerCase();
 	var txt3 = document.getElementById("key3").value.toLowerCase();
 
-	if(txt1 != "") objects += txt1;
-	if(objects != "") object += "||";	
-	if(txt2 != "") objects += txt2;
-	if(objects != "") object += "||";	
-	if(txt3 != "") objects += txt3;
-	if(objects != "") object += "||";	
+	if(txt1 != "") 
+		objects += txt1;
+	if(objects != "")
+		objects += "||";	
+
+	if(txt2 != "")
+		objects += txt2;
+	if(objects != "") 
+		objects += "||";	
+	
+	if(txt3 != "")
+		objects += txt3;
+	if(objects != "")
+		objects += "||";
 
 	document.getElementById("data").value = objects;
 	document.forms["sendData"].submit();
