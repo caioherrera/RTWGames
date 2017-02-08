@@ -10,7 +10,7 @@ function testClick(e) {
 }
 
 function newObject() {
-	select = document.getElementById("list");
+	/*select = document.getElementById("list");
 	select.readOnly = false;
 	var op = document.createElement("option");
 	var obj = document.getElementById("next").value.toLowerCase();
@@ -21,13 +21,13 @@ function newObject() {
 	document.getElementById("next").value = "";
 	op.selected = true;
 	select.appendChild(op);
-	select.readOnly = true;
+	select.readOnly = true;*/
 }
 
 function startGame(usuario, tema) {
-	timer = document.getElementById("timer");
+	/*timer = document.getElementById("timer");
 	document.getElementById("start").disabled = true;
-	
+
 	theme = document.getElementById("theme");
 	theme.value = tema.toLowerCase();
 
@@ -35,11 +35,11 @@ function startGame(usuario, tema) {
 	next.readOnly = false;
 	next.focus();
 
-	startTimer(30, timer, usuario);
+	startTimer(30, timer, usuario);*/
 }
 
 function startTimer(duration, display, username) {
-	var timer = duration, minutes, seconds;
+	/*var timer = duration, minutes, seconds;
 	setInterval(function() {
 		minutes = parseInt(timer / 60, 10);
 		seconds = parseInt(timer % 60, 10);
@@ -57,11 +57,11 @@ function startTimer(duration, display, username) {
 			data.value = objects;
 			document.forms["sendData"].submit();
 		}
-	}, 1000);
+	}, 1000);*/
 }
 
 window.onload = function() {
-	document.getElementById("start").disabled = false;
+	/*document.getElementById("start").disabled = false;
 	document.getElementById("next").value = "";
-	document.getElementById("theme").value = "";
+	document.getElementById("theme").value = "";*/
 }
