@@ -25,7 +25,7 @@ $(document).ready(function() {
 				result = response["result"];
 				if(result) {
 					clearInterval(calls);
-					$("#message").text("Opponent found!<br>");
+					$("#message").html("Opponent found!<br><br>");
 					$("#divGame").show();
 				}
 			},

@@ -12,8 +12,7 @@ def createSeed(identifications):
     updates = dict();
     updates["isInNell"], updates["score"] = existsInNell(identifications["entity"], identifications["category"]);
     updates["lazy"] = False;
-    updates["count"] = 1;
-    addFeedback(identifications, updates, 0);
+    addFeedback(identifications, None, updates);
 
 def subCategoryBelongsTo(identifications):
     #cursor = mongo.db.subcategories.find(identifications)
@@ -340,7 +339,8 @@ def finishGame(identifications):
             updates = dict()
             updates["winner"] = -1;
             if gameType == 1:
-                score1, score2 = calculateScores(data1, data2, category["name"][0], 1)
+                score1, score2 = calculateScores(data1, data2, category["name"][0]);
+                incrementFeedback(data1, data2, score1, score2, category["name"][0], 1);
 
                 if(score1 > score2):
                     updates["winner"] = cursor[0]["user1"]["_id"];
@@ -366,14 +366,14 @@ def finishGame(identifications):
                         entity = data2[i]
                         #exists, score = existsInNell(entity, category)
                         exists, score = None, 0.0
-                        fbIdent = dict()
-                        fbUpdates = dict()
+                        fbIdent, fbUpdates, fbInc = dict(), dict(), dict();
                         fbIdent["entity"] = entity
                         fbIdent["category"] = category
                         fbUpdates["score"] = score
-                        fbUpdates["count"] = 1
                         fbUpdates["lazy"] = True
-                        addFeedback(fbIdent, fbUpdates, 2)
+                        fbInc["numOccurrences.total"] = 1;
+                        fbInc["numOccurrences.game2"] = 1;
+                        addFeedback(fbIdent, fbInc, fbUpdates);
             elif gameType == 3:
                 score1, score2 = int(cursor[0]["score1"]), int(cursor[0]["score2"])
                 idUser = dict()
@@ -392,24 +392,36 @@ def finishGame(identifications):
                     entity = subIdentifications["name"].split("||")[0]
                     #exists, score = existsInNell(entity, category)
                     exists, score = None, 0.0
-                    fbIdent, fbUpdates = dict(), dict()
+                    fbIdent, fbUpdates, fbInc = dict(), dict(), dict();
                     fbIdent["entity"] = entity
                     fbIdent["category"] = category
                     fbUpdates["score"] = score
-                    fbUpdates["count"] = 1
                     fbUpdates["lazy"] = True
-                    addFeedback(fbIdent, fbUpdates, 3)
+                    fbInc["numOccurrences.total"] = 1;
+                    fbInc["numOccurrences.game3"] = 1;
+
+                    if(score1 > score2):
+                        fbInc["numVictories.total"] = 1;
+                        fbInc["numVictories.game3"] = 1;
+
+                    addFeedback(fbIdent, fbInc, fbUpdates)
                 for category in data2:
                     entity = subIdentifications["name"].split("||")[1]
                     #exists, score = existsInNell(entity, category)
                     exists, score = None, 0.0
-                    fbIdent, fbUpdates = dict(), dict()
+                    fbIdent, fbUpdates, fbInc = dict(), dict(), dict();
                     fbIdent["entity"] = entity
                     fbIdent["category"] = category
                     fbUpdates["score"] = score
-                    fbUpdates["count"] = 1
                     fbUpdates["lazy"] = True
-                    addFeedback(fbIdent, fbUpdates, 3)
+                    fbInc["numOccurrences.total"] = 1;
+                    fbInc["numOccurrences.game3"] = 1;
+
+                    if(score2 > score1):
+                        fbInc["numVictories.total"] = 1;
+                        fbInc["numVictories.game3"] = 1;
+
+                    addFeedback(fbIdent, fbInc, fbUpdates)
             else:
                 score1 = int(cursor[0]["score1"])
                 idUser = dict()
@@ -421,14 +433,13 @@ def finishGame(identifications):
                         category = data2[i]
                         #exists, score = existsInNell(entity, category)
                         exists, score = None, 0.0
-                        fbIdent = dict()
-                        fbUpdates = dict()
+                        fbIdent, fbUpdates, fbInc = dict(), dict(), dict();
                         fbIdent["entity"] = entity
                         fbIdent["category"] = category
                         fbUpdates["score"] = score
-                        fbUpdates["count"] = 1
                         fbUpdates["lazy"] = True
-                        addFeedback(fbIdent, fbUpdates, 4)
+                        fbInc["numOccurrences.total"] = 1;
+                        addFeedback(fbIdent, fbInc, fbUpdates)
             finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updates["status"] = 1
             updates["finish"] = finish
