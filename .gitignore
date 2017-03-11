@@ -59,4 +59,4 @@ target/
 *.*~
 app.py
 venv/
-rtwgames/
+.idea/

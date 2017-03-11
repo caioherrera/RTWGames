@@ -6,28 +6,6 @@ from random import randint
 from rtw import *
 import sys
 
-#subCategoryBelongsTo(identifications): dict | None
-#pickRandomCategory(): dict | None
-#pickRandomSubCategory(identifications): dict | None
-
-#createUser(identifications): ObjectId
-#updateUser(identifications, updates): bool
-#getUser(identifications): dict | None
-#isUserOnline(identifications): bool
-#changeUserStatus(identifications, online): bool
-#updateScore(identifications, score): bool
-
-#createGame(identifications): ObjectId
-#updateGame(identifications, updates): bool
-#getGame(identifications): dict | None
-#findWaitingGame(identifications, user): dict | None
-#joinGame(identifications, user): bool
-#isGameReady(identifications): bool
-#startGame(identifications): bool
-#checkGameStatus(identifications): int
-#userFromGame(identifications, number): ObjectId | None
-#finishGame(identifications): bool
-
 localGames = dict();
 
 def createSeed(identifications):
@@ -77,9 +55,37 @@ def createUser(identifications):
     identifications["score"] = 0
     regDate = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     identifications["regDate"] = regDate
+
+    identifications["numMatches"] = dict();
+    identifications["numMatches"]["total"] = 0;
+    identifications["numMatches"]["game1"] = dict();
+    identifications["numMatches"]["game2"] = dict();
+    identifications["numMatches"]["game3"] = dict();
+    identifications["numMatches"]["game1"]["total"] = 0;
+    identifications["numMatches"]["game2"]["total"] = 0;
+    identifications["numMatches"]["game3"]["total"] = 0;
+
+    identifications["numVictories"] = dict();
+    identifications["numVictories"]["total"] = 0;
+    identifications["numVictories"]["game1"] = dict();
+    identifications["numVictories"]["game2"] = dict();
+    identifications["numVictories"]["game3"] = dict();
+    identifications["numVictories"]["game1"]["total"] = 0;
+    identifications["numVictories"]["game2"]["total"] = 0;
+    identifications["numVictories"]["game3"]["total"] = 0;
+
     #_id = mongo.db.users.insert_one(identifications)
     _id = db.users.insert_one(identifications)
     return _id.inserted_id
+
+def incrementUser(identifications, updates):
+    #cursor = mongo.db.users.find(identifications)
+    cursor = db.users.find(identifications)
+    if cursor.count() > 0:
+        #mongo.db.users.update_one(identifications, {"$set": updates})
+        db.users.update_one(identifications, {"$inc": updates})
+        return True
+    return False
 
 def updateUser(identifications, updates):
     #cursor = mongo.db.users.find(identifications)
@@ -137,6 +143,7 @@ def createGame(identifications):
     identifications["start"] = None
     identifications["finish"] = None
     identifications["status"] = 0
+    identifications["winner"] = 0
     #_id = mongo.db.games.insert_one(identifications)
     _id = db.games.insert_one(identifications)
 
@@ -145,14 +152,14 @@ def createGame(identifications):
 
     return _id.inserted_id
 
-def saveGame(identifications):
+'''def saveGame(identifications):
     #print("saveGame", file=sys.stderr);
     _id = identifications["_id"];
     if _id in localGames.keys():
         #print("salvando o jogo", file=sys.stderr);
         db.games.update_one({"_id": _id}, {"$set": localGames[_id]});
         return True;
-    return False;
+    return False;'''
 
 def updateGame(identifications, updates):
 
@@ -165,7 +172,6 @@ def updateGame(identifications, updates):
     #return False;
     cursor = db.games.find(identifications);
     if(cursor.count() > 0):
-        print("encontrou o jogo a ser atualizado!", file=sys.stderr);
         db.games.update_one(identifications, {"$set": updates});
         return True;
     return False;
@@ -196,7 +202,8 @@ def findWaitingGame(identifications, user):
     #		return localGames[_id];
     #return None;
     identifications["status"] = 0;
-    identifications["user1"] = { "$ne": user };
+    identifications["user1"] = dict();
+    identifications["user1"] = { "$ne": getUser({"_id": user}) };
     cursor = db.games.find(identifications);
     if(cursor.count() > 0):
         return cursor[0];
@@ -217,12 +224,51 @@ def joinGame(identifications, user):
     cursor = db.games.find(identifications);
     if(cursor.count() > 0):
         updates = dict();
+        key = str();
+
         if(cursor[0]["user1"] == None):
-            updates["user1"] = user;
-            return updateGame(identifications, updates);
+            key = "user1";
         elif("user2" in cursor[0].keys() and cursor[0]["user2"] == None):
-            updates["user2"] = user;
-            return updateGame(identifications, updates);
+            key = "user2";
+
+        updates[key] = getUser({"_id": user});
+        updates[key].pop("permission", None);
+        updates[key].pop("user", None);
+        updates[key].pop("online", None);
+        updates[key].pop("password", None);
+        updates[key].pop("email", None);
+
+        firstKey = "game" + str(cursor[0]["gameType"]);
+        theme = cursor[0]["theme"];
+
+        for k in updates[key]["numMatches"].keys():
+            if(k != "total" and k != theme):
+                updates[key]["numMatches"].pop(k, None);
+
+        if(theme not in updates[key]["numMatches"].keys()):
+            updates[key]["numMatches"][theme] = 0;
+
+        for k in updates[key]["numVictories"].keys():
+            if(k != "total" and k != theme):
+                updates[key]["numVictories"].pop(k, None);
+
+        if(theme not in updates[key]["numVictories"].keys()):
+            updates[key]["numVictories"][theme] = 0;
+
+        if(not updateGame(identifications, updates)):
+            return False;
+
+        identifications = dict();
+        updates = dict();
+
+        identifications["_id"] = user;
+
+        updates["numMatches.total"] = 1;
+        updates["numMatches." + firstKey + "." + theme] = 1;
+        updates["numMatches." + firstKey + ".total"] = 1;
+
+        return incrementUser(identifications, updates);
+
     return False;
 
 def isGameReady(identifications):
@@ -269,14 +315,10 @@ def userFromGame(identifications, number):
 
 def finishGame(identifications):
 
-    #print("no metodo finishGame...Identifications: ", file=sys.stderr);
-    #print(identifications, file=sys.stderr);
     cursor = db.games.find(identifications)
 
     if(cursor.count() > 0):
-        #print("encontrou o jogo", file=sys.stderr);
         if cursor[0]["data1"] != None and cursor[0]["data2"] != None and not cursor[0]["finished"]:
-            #print("dados preenchidos, jogo nao finalizado", file=sys.stderr);
             updateGame(identifications, {"finished": True})
             subIdentifications = dict()
             subIdentifications["name"] = str(cursor[0]["theme"])
@@ -296,23 +338,28 @@ def finishGame(identifications):
             data2 = cursor[0]["data2"];
             gameType = int(cursor[0]["gameType"])
             updates = dict()
+            updates["winner"] = -1;
             if gameType == 1:
-                #print("gameType 1", file=sys.stderr);
                 score1, score2 = calculateScores(data1, data2, category["name"][0], 1)
+
+                if(score1 > score2):
+                    updates["winner"] = cursor[0]["user1"]["_id"];
+                elif (score1 < score2):
+                    updates["winner"] = cursor[0]["user2"]["_id"];
+
                 updates["score1"] = score1
                 idUser = dict()
-                idUser["_id"] = cursor[0]["user1"]
+                idUser["_id"] = cursor[0]["user1"]["_id"];
                 updateScore(idUser, score1)
-                #print("atualizou score 1", file=sys.stderr);
                 if "score2" in cursor[0].keys():
                     updates["score2"] = score2
-                    idUser["_id"] = cursor[0]["user2"]
+                    idUser["_id"] = cursor[0]["user2"]["_id"];
                     updateScore(idUser, score2)
-                    #print("atualizou score 2", file=sys.stderr);
             elif gameType == 2:
                 score1 = int(cursor[0]["score1"])
                 idUser = dict()
-                idUser["_id"] = cursor[0]["user1"]
+                idUser["_id"] = cursor[0]["user1"]["_id"];
+                updates["winner"] = cursor[0]["user1"]["_id"];
                 updateScore(idUser, score1)
                 for i in range(cursor[0]["score2"]):
                     for category in data1:
@@ -330,11 +377,17 @@ def finishGame(identifications):
             elif gameType == 3:
                 score1, score2 = int(cursor[0]["score1"]), int(cursor[0]["score2"])
                 idUser = dict()
-                idUser["_id"] = cursor[0]["user1"]
+                idUser["_id"] = cursor[0]["user1"]["_id"];
                 updateScore(idUser, score1)
                 idUser = dict()
-                idUser["_id"] = cursor[0]["user2"]
+                idUser["_id"] = cursor[0]["user2"]["_id"];
                 updateScore(idUser, score2)
+
+                if(score1 > score2):
+                    updates["winner"] = cursor[0]["user1"]["_id"];
+                elif (score1 < score2):
+                    updates["winner"] = cursor[0]["user2"]["_id"];
+
                 for category in data1:
                     entity = subIdentifications["name"].split("||")[0]
                     #exists, score = existsInNell(entity, category)
@@ -360,8 +413,9 @@ def finishGame(identifications):
             else:
                 score1 = int(cursor[0]["score1"])
                 idUser = dict()
-                idUser["_id"] = cursor[0]["user1"]
+                idUser["_id"] = cursor[0]["user1"]["_id"];
                 updateScore(idUser, score1)
+                updates["winner"] = cursor[0]["user1"]["_id"];
                 for i in range(cursor[0]["score2"]):
                     for entity in data1:
                         category = data2[i]
@@ -378,13 +432,23 @@ def finishGame(identifications):
             finish = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updates["status"] = 1
             updates["finish"] = finish
-            #print("vai dar o ultimo update...Identifications:", file=sys.stderr);
-            #print(identifications, file=sys.stderr);
-            #print("finalizando o jogo", file=sys.stderr);
-            return updateGame(identifications, updates);# and saveGame(identifications);
+
+            if(not updateGame(identifications, updates)):
+                return False;
+
+            identifications = dict();
+            identifications["_id"] = updates["winner"];
+
+            updates = dict();
+
+            firstKey = "game" + str(gameType);
+            updates["numVictories.total"] = 1;
+            updates["numVictories." + firstKey + "." + cursor[0]["theme"]] = 1;
+            updates["numVictories." + firstKey + ".total"] = 1;
+
+            return incrementUser(identifications, updates);
+
         else:
-            #print("dados nao preenchidos...Identifications:", file=sys.stderr);
-            #print(identifications, file=sys.stderr);
             updates = dict()
             updates["status"] = 3
             return updateGame(identifications, updates);

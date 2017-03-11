@@ -4,7 +4,7 @@
 	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
 
 	<script type="text/javascript" src='{{ url_for('static', filename='jquery-3.1.1.js') }}'></script>
-	<script type="text/javascript" src='{{ url_for('static', filename='ajaxFunctions.js') }}'></script>
+	<script type="text/javascript" src='{{ url_for('static', filename='firstGame.js') }}'></script>
 
 	<title>First Game - RTW :: Games</title>
 </head>
@@ -40,7 +40,7 @@
 			  <p id="userID" hidden>{{ _id }}</p>
 			  <p id="username" hidden>{{ username }}</p>
 			  <p id="theme" hidden>{{ theme }}</p>
-			  <p id="message">Waiting for your opponent...</p>
+			  <pre id="message">Waiting for your opponent...</pre>
 
 			  <div id="divGame">
 	              <input type="button" id="btnStart" value="Start Game" onclick="startGame();"><br>
