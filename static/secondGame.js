@@ -75,18 +75,20 @@ function endGame() {
     var data = {"gameID": gameID, "userID": userID, "data": userData, "score": score, "gameType": 2};
     var saved = false;
 
-    $.ajax({
-        url: "/ajax_saveData",
-        data: JSON.stringify(data),
-        contentType: "application/json;charset=UTF-8",
-        type: "POST",
-        success: function(response) {
-            saved = response["result"];
-        },
-        error: function(request, status, error) {
-            $("#message").text(request.responseText);
-        }
-    });
+    if(!saved) {
+        $.ajax({
+            url: "/ajax_saveData",
+            data: JSON.stringify(data),
+            contentType: "application/json;charset=UTF-8",
+            type: "POST",
+            success: function(response) {
+                saved = response["result"];
+            },
+            error: function(request, status, error) {
+                $("#message").text(request.responseText);
+            }
+        });
+    }
 
     $("#message").html("Game Over!<br>Your score is: " + score + " points!<br>");
 }
@@ -100,20 +102,24 @@ function startTimer(duration) {
 
     function decTimer() {
 
-        minutes = parseInt(timer / 60, 10);
-		seconds = parseInt(timer % 60, 10);
+        if(!ended) {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
 
-		$("#timer").text("Time remaining: " + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+            if(timer >= 0)
+                $("#timer").text("Time remaining: " + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
 
-        var t = timer--;
-        if(ended || t <= 0) {
-            timer = 0;
+            var t = timer--;
+            if(t <= 0)
+                ended = true;
+            else if(t % 5 == 0) {
+                score -= 5;
+                nextHint();
+            }
+        }
+        else {
             clearInterval(calls);
             endGame();
-        }
-        else if(t % 5 == 0) {
-            score -= 5;
-            nextHint();
         }
     };
 }
@@ -123,7 +129,6 @@ function verifyAnswer(data) {
     if(themes.indexOf(data) != -1) {
         $("#message").html("Correct answer! Congratulations!<br><br>");
         ended = true;
-        endGame();
     }
     else
         $("#message").html("Wrong answer! Keep trying!<br><br>");
