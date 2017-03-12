@@ -1,11 +1,10 @@
-var userID, gameID, username, theme;
+var userID, gameID, theme;
 var userData = [];
 
 $(document).ready(function() {
 
 	userID = $("#userID").text();
 	gameID = $("#gameID").text();
-	username = $("#username").text();
 	theme = $("#theme").text();
 
 	$("#divGame").hide();
@@ -79,7 +78,7 @@ function startTimer(duration) {
 			$("#divGame").hide();
 
 			/* FAZER O ENVIO DE DADOS PARA O BACKEND VIA AJAX */ 
-			var data = {"gameID": gameID, "userID": userID, "data": userData};
+			var data = {"gameID": gameID, "userID": userID, "data": userData, "gameType": 1};
 			var saved = false;
 			
 			$.ajax({
@@ -135,9 +134,6 @@ function startTimer(duration) {
                 });
             }
         }
-		/*	else
-				$("#message").text(saved);
-		}*/
 	};
 }
 

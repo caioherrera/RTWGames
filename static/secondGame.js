@@ -1,102 +1,130 @@
-var data1 = "";
-var themes = [];
-var data2 = "";
-var data = [];
-var count = 0;
+var userID, gameID, themes, hints;
+var userData = {};
+var countingData = 0;
+var countingHints = 0;
 var score = 35;
-var endGame = false;
+var givenHints = [];
+var ended = false;
+
+$(document).ready(function() {
+
+    userID = $("#userID").text();
+    gameID = $("#gameID").text();
+    themes = $("#themes").text().split("||");
+    hints = $("#hints").text().split("||");
+
+    $("#message").html("Guess the theme of the round!<br><br>");
+
+});
 
 function testClick(e) {
-	if(e.which == 13) {
-		value = document.getElementById("next").value.toLowerCase();
-		newObject("guesses", value, true);
-		if(themes.indexOf(value) != -1) {
-			document.getElementById("theme").innerHTML = "Correct answer!";
-			endGame = true;
-			end();
-		}
-		else {
-			document.getElementById("theme").innerHTML = "Wrong answer!";
-		}
-		document.getElementById("next").value = "";
-		return false;
-	}
-	return true;
+    e = e || window.event;
+    if(e.keyCode == 13) {
+        var d = $("#txtNext").val();
+        if(d != "") {
+            verifyAnswer(d);
+            addData(d);
+        }
+        return false;
+    }
+    return true;
 }
 
-function newObject(name, value, save) {
-	select = document.getElementById(name);
-	select.readOnly = false;
-	var op = document.createElement("option");
-	var obj = value;
-	op.text = obj;
-	if(save) {
-		if(data1 != "")
-			data1 += "||";
-		data1 += obj;
-	}
-	op.selected = true;
-	select.appendChild(op);
-	select.readOnly = true;
+function addData() {
+    var d = $("#txtNext").val();
+    if(d != "") {
+        userData[d.toLowerCase()] = givenHints.slice();
+        countingData++;
+
+        $("#lstPrevious").prop("readOnly", false);
+		$("#lstPrevious").append($("<option>", { value: countingData, text: d }));
+		$("#lstPrevious").prop("readOnly", true);
+
+    }
+    $("#txtNext").val("");
+	$("#txtNext").focus();
 }
 
-function startGame(usuario, temas, dados) {
-	timer = document.getElementById("timer");
-	document.getElementById("start").disabled = true;
+function startGame() {
 
-	themes = temas.toLowerCase().split("||");
-	data2 = dados.toLowerCase();
-	data = dados.toLowerCase().split("||");
+	$("#btnStart").prop("disabled", true);
+	$("#txtNext").prop("readOnly", false);
+	$("#txtNext").focus();
 
-	next = document.getElementById("next");
-	next.readOnly = false;
-	next.focus();
-
-	startTimer(30, timer, usuario);
+	startTimer(30);
 }
 
 function nextHint() {
-	if(count < data.length)
-		newObject("hints", data[count++], false);
+    if(countingHints < hints.length) {
+
+        $("#lstHints").prop("readOnly", false);
+		$("#lstHints").append($("<option>", { value: countingHints + 1, text: hints[countingHints] }));
+		$("#lstHints").prop("readOnly", true);
+
+		givenHints.push(hints[countingHints]);
+		countingHints++;
+    }
 }
 
-function end() {
-	next = document.getElementById("next");
-	next.value = "";
-	next.readOnly = true;
-	document.getElementById("data1").value = data1;
-	document.getElementById("data2").value = data2;
-	document.getElementById("count").value = count;
-	document.getElementById("score").value = score;
+//TO-DO
 
-	document.forms["sendData"].submit();
+function endGame() {
+    $("#txtNext").prop("readOnly", true);
+    $("#divGame").hide();
+
+    var data = {"gameID": gameID, "userID": userID, "data": userData, "score": score, "gameType": 2};
+    var saved = false;
+
+    $.ajax({
+        url: "/ajax_saveData",
+        data: JSON.stringify(data),
+        contentType: "application/json;charset=UTF-8",
+        type: "POST",
+        success: function(response) {
+            saved = response["result"];
+        },
+        error: function(request, status, error) {
+            $("#message").text(request.responseText);
+        }
+    });
+
+    $("#message").html("Game Over!<br>Your score is: " + score + " points!<br>");
 }
 
-function startTimer(duration, display, username) {
-	var timer = duration, minutes, seconds;
-	setInterval(function() {
-		minutes = parseInt(timer / 60, 10);
+function startTimer(duration) {
+
+    var timer = duration;
+    var minutes, seconds;
+
+    var calls = setInterval(decTimer, 1000);
+
+    function decTimer() {
+
+        minutes = parseInt(timer / 60, 10);
 		seconds = parseInt(timer % 60, 10);
 
-		minutes = minutes < 10 ? "0" + minutes : minutes;
-		seconds = seconds < 10 ? "0" + seconds : seconds;
-		display.textContent = "Time remaining: " + minutes + ":" + seconds;
+		$("#timer").text("Time remaining: " + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
 
-		if(timer % 5 == 0 && !endGame) {
-			if(timer > 0)
-				nextHint();
-			score -= 5;
-		}
-
-		if (!endGame && timer-- <= 0) {
-			timer = 0;
-			end();
-		}
-	}, 1000);
+        var t = timer--;
+        if(ended || t <= 0) {
+            timer = 0;
+            clearInterval(calls);
+            endGame();
+        }
+        else if(t % 5 == 0) {
+            score -= 5;
+            nextHint();
+        }
+    };
 }
 
-window.onload = function() {
-	document.getElementById("start").disabled = false;
-	document.getElementById("next").value = "";
-	document.getElementById("theme").innerHTML = "";
+function verifyAnswer(data) {
+    data = data.toLowerCase();
+    if(themes.indexOf(data) != -1) {
+        $("#message").html("Correct answer! Congratulations!<br><br>");
+        ended = true;
+        endGame();
+    }
+    else
+        $("#message").html("Wrong answer! Keep trying!<br><br>");
 }

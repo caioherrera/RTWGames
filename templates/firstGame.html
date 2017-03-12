@@ -1,10 +1,10 @@
 <html><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<meta charset="utf-8">
-	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
+	<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='main.css') }}">
 
-	<script type="text/javascript" src='{{ url_for('static', filename='jquery-3.1.1.js') }}'></script>
-	<script type="text/javascript" src='{{ url_for('static', filename='firstGame.js') }}'></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='jquery-3.1.1.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='firstGame.js') }}"></script>
 
 	<title>First Game - RTW :: Games</title>
 </head>
@@ -31,14 +31,11 @@
 			</nav>
 		</div>
 
-
-
         <div id="body">
  	       <h2>First Game</h2>
 
 			  <p id="gameID" hidden>{{ game }}</p>
 			  <p id="userID" hidden>{{ _id }}</p>
-			  <p id="username" hidden>{{ username }}</p>
 			  <p id="theme" hidden>{{ theme }}</p>
 			  <pre id="message">Waiting for your opponent...</pre>
 
@@ -53,13 +50,9 @@
                   <p id="timer"></p>				  
 			  </div>
 
-
-
               <div id="footer">
 	              Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="https://www.pythonanywhere.com/user/caioherrera/files/home/caioherrera/RTWGames/templates/br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
               </div>
-
-
 
          </div>
     </div>

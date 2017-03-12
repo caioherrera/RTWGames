@@ -2,16 +2,20 @@
 <head>
 	<meta charset="utf-8">
 	<link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='main.css') }}'>
-    {% if code == 0 or code == 3 %}
-        <meta http-equiv="refresh" content="1;url={{ url_for('secondGame', game = game) }}">
-    {% endif %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.1.1.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='secondGame.js') }}"></script>
-	<title>Second Game - RTW :: Games</title>
+
+    <title>Second Game - RTW :: Games</title>
 </head>
 <body>	
 	<div id="content">
+
 		<div id="header">
-			<h1>RTW :: Games<br><div id="subtitle">Research Project at Federal University of São Carlos</div></h1>
+			<h1>
+                RTW :: Games<br>
+                <div id="subtitle">Research Project at Federal University of São Carlos</div>
+            </h1>
 			<nav>
 				<ul>
 					<li><a href="{{ url_for('index') }}">Home</a></li>
@@ -26,60 +30,42 @@
 				</ul>
 			</nav>
 		</div>
+
 		<div id="body">
 			<h2>Second Game</h2>
-		    	{% if code == 1 or code == 10 %}
-		        	{% block code1 %}
-		            	<p>This game has been finished.</p>
-						{% if code == 10 %}
-							<p>You scored {{ score }} points!</p>
-						{% endif %}
-		            {% endblock code1 %}
-		        {% else %}
-		            {% if code == 2 %}
-		            	{% block code2 %}
-		             		<input type="button" id="start" value="Start game" onclick="startGame('{{ username }}', '{{ themes }}', '{{ data }}')"><br>
-		                	<p>Guess the theme of the round!</p>
-		                	<table>
-		                		<tr>
-		                			<td>
-					                	<p id="timer"></p>
-		                				<p>Next guess</p>
-		                				<p><input type="text" readonly="true" id="next" onKeyPress="return testClick(event)"></p>
-					                	<p id="theme" class="themeCorrect">&nbsp;</p>
-		                			</td>
-									<td width=50></td>
-		                			<td>
-										<p>Previous guesses</p>
-		                				<select size=5 readonly="true" id="guesses" width="100"></select>
-		                			</td>
-									<td width=50></td>
-		                			<td>
-										<p>Hints</p>
-		                				<select size=5 readonly="true" id="hints" width="100"></select>
-		                			</td>
-		                		</tr>
-		                	</table>
-							<form name="sendData" method="POST" action="/endGame">
-								<input type="hidden" id="number" name="number" value="2">
-								<input type="hidden" id="game" name="game" value="{{ game }}">
-								<input type="hidden" id="user" name="user" value="{{ _id }}">
-								<input type="hidden" id="data1" name="data1">
-								<input type="hidden" id="data2" name="data2">
-								<input type="hidden" id="count" name="count">
-								<input type="hidden" id="score" name="score">
-							</form>
-		                {% endblock code2 %}
-		            {% else %}
-		            	{% block code4 %}
-		                 	<p>This game does not exist.</p>
-	 	                {% endblock code4 %}
-         		   {% endif %}
-        		{% endif %}
-			<div id="footer">
-				Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
-			</div>
+
+                <p id="gameID" hidden>{{ game }}</p>
+                <p id="userID" hidden>{{ _id }}</p>
+                <p id="themes" hidden>{{ themes }}</p>
+                <p id="hints" hidden>{{ data }}</p>
+                <pre id="message">Guess the theme of the round!</pre>
+
+                <div id="divGame">
+                    <input type="button" id="btnStart" value="Start game" onclick="startGame()"><br>
+                    <p class="gameLabel">Next guess</p>
+                    <input type="text" readonly="true" id="txtNext" onkeypress="return testClick(event);"><br>
+
+                    <table>
+                        <tr height=30></tr>
+		            	<tr>
+		                	<td>
+								<p class="gameType">Hints</p>
+		                		<select size=5 readonly="true" id="lstHints" width="100"></select>
+		                	</td>
+							<td width=50></td>
+		                	<td>
+								<p class="gameType">Previous entries</p>
+		                		<select size=5 readonly="true" id="lstPrevious" width="100"></select>
+		                	</td>
+		                </tr>
+                    </table>
+					<p id="timer"></p>
+                </div>
+
+			    <div id="footer">
+				    Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
+			    </div>
 		</div>
 	</div>
-</body>
-</html>
+
+</body></html>

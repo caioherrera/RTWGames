@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function
 import json
-from flask import Flask, request, render_template, url_for, redirect, session, jsonify
-from app import app, mongo, db
-from random import randint
+from flask import request, render_template, url_for, redirect, session, jsonify
+from app import app, db
 from bson.objectid import ObjectId
 from query import *
 from rtw import *
@@ -33,39 +32,34 @@ def admin():
             if isUserAdmin(identifications):
 
                 if request.method == "POST":
-                    form = int(request.form["form"]);
+                    form = int(request.form["form"])
                     if form == 0:
-                        #new seed
-                        identifications = dict();
-                        identifications["entity"] = request.form["entity"];
-                        identifications["category"] = request.form["category"];
-                        createSeed(identifications);
-                        return render_template("admin.html", username = session["user"], form1 = 1, form2 = 0);
+                        createSeed(request.form["entity"], request.form["category"])
+                        return render_template("admin.html", username = session["user"], form1 = 1, form2 = 0)
                     else:
                         #new admin
-                        identifications = dict();
-                        identifications["user"] = request.form["user"];
-                        identifications["email"] = request.form["email"];
-                        newAdm = getUser(identifications);
+                        identifications = dict()
+                        identifications["user"] = request.form["user"]
+                        identifications["email"] = request.form["email"]
+                        newAdm = getUser(identifications)
 
-                        if(newAdm == None):
-                            return render_template("admin.html", username = session["user"], form1 = 0, form2 = 1);
-                        elif(newAdm["permission"] == 1):
-                            return render_template("admin.html", username = session["user"], form1 = 0, form2 = 2);
+                        if newAdm == None:
+                            return render_template("admin.html", username = session["user"], form1 = 0, form2 = 1)
+                        elif newAdm["permission"] == 1:
+                            return render_template("admin.html", username = session["user"], form1 = 0, form2 = 2)
                         else:
-                            updates = dict();
-                            updates["permission"] = 1;
-                            updateUser(identifications, updates);
-                            return render_template("admin.html", username = session["user"], form1 = 0, form2 = 3);
+                            updates = dict()
+                            updates["permission"] = 1
+                            updateUser(identifications, updates)
+                            return render_template("admin.html", username = session["user"], form1 = 0, form2 = 3)
                 else:
-                    return render_template("admin.html", username = session["user"], form1 = 0, form2 = 0);
+                    return render_template("admin.html", username = session["user"], form1 = 0, form2 = 0)
             else:
                 return redirect(url_for("index"))
         else:
             return redirect(url_for("login"))
     else:
         return redirect(url_for("login"))
-
 
 #################################### PROFILE ####################################
 @app.route("/profile")
@@ -96,7 +90,7 @@ def login():
             session["user"] = user["user"]
             return render_template("login.html", code = 1, username = user["user"], admin = isUserAdmin({"user": session["user"]}))
         else:
-            identifications = dict();
+            identifications = dict()
             identifications["user"] = request.form["user"]
             identifications["password"] = request.form["password"]
             user = getUser(identifications)
@@ -107,33 +101,31 @@ def login():
             else:
                 return render_template("login.html", code = 2)
 
-
 #################################### REGISTER ####################################
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
         return render_template("register.html", code = 0)
     elif request.method == "POST":
-        identifications = dict()
-        identifications["email"] = request.form["email"]
-        identifications["user"] = request.form["user"]
-        identifications["password"] = request.form["password"]
-        identifications["permission"] = 0
+
+        email = request.form["email"]
+        user = request.form["user"]
+        password = request.form["password"]
+        permission = 0
         confPassword = request.form["confPassword"]
-        if not identifications["password"] == confPassword:
+        if not password == confPassword:
             return render_template("register.html", code = 2)
-        elif(getUser({"user": request.form["user"]}) != None):
+        elif getUser({"user": request.form["user"]}) != None:
             return render_template("register.html", code = 3)
-        elif(getUser({"email": request.form["email"]}) != None):
+        elif getUser({"email": request.form["email"]}) != None:
             return render_template("register.html", code = 4)
         else:
-            if(createUser(identifications) != None):
+            if createUser(email, user, password, permission) != None:
                 return render_template("register.html", code = 1)
             else:
                 return render_template("register.html", code = 5)
     else:
         return "Invalid request"
-
 
 #################################### OVERVIEW ####################################
 @app.route("/overview")
@@ -157,7 +149,6 @@ def logout():
     session.pop("user", None)
     return render_template("logout.html")
 
-
 #################################### GAMES ####################################
 @app.route("/games")
 def games():
@@ -171,137 +162,78 @@ def games():
     else:
         return redirect(url_for("login"))
 
-
 #################################### FIRST GAME ####################################
 @app.route("/firstGame")
-@app.route("/firstGame/<game>")
-def firstGame(game = None):
+def firstGame():
     if session.get("user"):
         identifications = dict()
         identifications["user"] = session["user"]
         user = getUser(identifications)
         if user != None:
+            identifications = dict()
+            identifications["gameType"] = 1
+            game = findWaitingGame(identifications, user["_id"])
             if game == None:
+                category = pickRandomCategory()
+                theme = category["name"][0]
                 identifications = dict()
                 identifications["gameType"] = 1
-                game = findWaitingGame(identifications, user["_id"])
-                if game == None:
-                    category = pickRandomCategory()
-                    #identifications = dict()
-                    #identifications["category"] = category["_id"]
-                    #subCategory = pickRandomSubCategory(identifications)
-                    #theme = subCategory["name"]
-                    theme = category["name"][0]
-                    identifications = dict()
-                    identifications["gameType"] = 1
-                    identifications["theme"] = theme
-                    game = createGame(identifications)
-                    identifications["_id"] = game
-                    joinGame(identifications, user["_id"])
-                    return render_template("firstGame.html", username = user["user"], code = 0, theme = theme, game = str(game), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                else:
-                    identifications = dict()
-                    identifications["_id"] = game["_id"]
-                    joinGame(identifications, user["_id"])
-                    theme = game["theme"]
-                    if isGameReady(identifications):
-                        startGame(identifications)
-                        return render_template("firstGame.html", username = user["user"], code = 2, theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        return render_template("firstGame.html", username = user["user"], code = 0, theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+                identifications["theme"] = theme
+                game = createGame(identifications)
+                identifications["_id"] = game
+                joinGame(identifications, user["_id"])
+                return render_template("firstGame.html", theme = theme, game = str(game), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
             else:
-                idGame = -1
-                theme = ""
-                status = 4
-                if len(game) != 24:
-                    return render_template("firstGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
                 identifications = dict()
-                identifications["_id"] = ObjectId(game)
-                game = getGame(identifications)
-                if game != None:
-                    theme = game["theme"]
-                    status = game["status"]
-                    idGame = game["_id"]
-                if status == 1:
-                    if user["_id"] == userFromGame(identifications, 1)["_id"]:
-                        return render_template("firstGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]), admin = isUserAdmin({"user": session["user"]}))
-                    elif user["_id"] == userFromGame(identifications, 2)["_id"]:
-                        return render_template("firstGame.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score2"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        return render_template("firstGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                else:
-                    if user["_id"] == userFromGame(identifications, 1)["_id"] or user["_id"] == userFromGame(identifications, 2)["_id"]:
-                        return render_template("firstGame.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        return render_template("firstGame.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+                identifications["_id"] = game["_id"]
+                joinGame(identifications, user["_id"])
+                theme = game["theme"]
+                if isGameReady(identifications):
+                    startGame(identifications)
+                return render_template("firstGame.html", theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
         else:
             return redirect(url_for("login"))
     else:
         return redirect(url_for("login"))
 
-
 #################################### SECOND GAME ####################################
 @app.route("/secondGame")
-@app.route("/secondGame/<game>")
-def secondGame(game = None):
+def secondGame():
     if session.get("user"):
         identifications = dict()
         identifications["user"] = session["user"]
         user = getUser(identifications)
         if user != None:
-            if game == None:
-                identifications = dict()
-                category = pickRandomCategory()
-                themes = category["name"]
-                theme = themes[0]
-                strThemes = "||".join(themes) + "||"
-                identifications["gameType"] = 2
-                identifications["theme"] = theme
-                game = createGame(identifications)
-                identifications = dict()
-                identifications["_id"] = game
-                joinGame(identifications, user["_id"])
+            identifications = dict()
+            category = pickRandomCategory()
+            themes = category["name"]
+            theme = themes[0]
 
-                dataId = dict()
-                dataId["category"] = theme
+            strThemes = "||".join(themes) + "||"
+            identifications["gameType"] = 2
+            identifications["theme"] = theme
+            game = createGame(identifications)
+            identifications = dict()
+            identifications["_id"] = game
+            joinGame(identifications, user["_id"])
 
-                #ascending order from score
-                sortCriteria = [("score", 1)]
-                maxValues = 10
+            dataId = dict()
+            dataId["category"] = theme
 
-                data2 = str()
-                first = True
-                for i in getData(dataId, sortCriteria, maxValues):
-                    if not first:
-                        data2 += "||"
-                    first = False
-                    data2 += str(i)
+            #ascending order from score
+            sortCriteria = [("score", 1)]
+            maxValues = 10
 
-                updates = dict()
-                updates["data2"] = data2
-                updateGame(identifications, updates)
-                startGame(identifications)
-                return render_template("secondGame.html", username = user["user"], code = 2, themes = strThemes, game = str(game), _id = str(user["_id"]), data = data2, admin = isUserAdmin({"user": session["user"]}))
-            else:
-                idGame = -1
-                theme = ""
-                status = 4
-                if len(game) != 24:
-                    return render_template("secondGame.html", username = user["user"], code = status, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                identifications = dict()
-                identifications["_id"] = ObjectId(game)
-                game = getGame(identifications)
-                if game != None:
-                    theme = game["theme"]
-                    status = game["status"]
-                    idGame = game["_id"]
-                if status == 1:
-                    if user["_id"] == userFromGame(identifications, 1)["_id"]:
-                        return render_template("secondGame.html", username = user["user"], code = 10, game = idGame, _id = str(user["_id"]), score = int(game["score1"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        return render_template("secondGame.html", username = user["user"], code = 1, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                else:
-                    return render_template("secondGame.html", username = user["user"], code = status, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+            data2 = str()
+            first = True
+            for i in getData(dataId, sortCriteria, maxValues):
+                if not first:
+                    data2 += "||"
+                first = False
+                data2 += str(i)
+
+            startGame(identifications)
+            return render_template("secondGame.html", themes = strThemes, game = str(game), _id = str(user["_id"]), data = data2, admin = isUserAdmin({"user": session["user"]}))
         else:
             return redirect(url_for("login"))
     else:
@@ -480,7 +412,6 @@ def endGame():
         user = getUser(identifications)
         return render_template("thirdGameB.html", username = user["user"], code = 1, score = updates["score1"], game = str(identifications["_id"]), _id = user["_id"], admin = isUserAdmin({"user": session["user"]}))
 
-
 '''#################################### UPDATE ####################################
 @app.route("/update")
 def update():
@@ -589,7 +520,7 @@ def data():
         identifications = dict()
         identifications["user"] = session["user"]
         if isUserOnline(identifications):
-            return render_template("data.html", username = session["user"], admin = isUserAdmin({"user": session["user"]}));
+            return render_template("data.html", username = session["user"], admin = isUserAdmin({"user": session["user"]}))
         else:
             return redirect(url_for("login"))
     else:
@@ -598,54 +529,54 @@ def data():
 #################################### GENERATE DATA ####################################
 @app.route("/generateData", methods=["GET"])
 def generateData():
-    search = request.args["search"];
-    gameType = int(request.args["gameType"]);
-    position = int(request.args["position"]);
-    count = int(request.args["count"]);
-    score = float(request.args["score"]);
+    search = request.args["search"]
+    gameType = int(request.args["gameType"])
+    position = int(request.args["position"])
+    count = int(request.args["count"])
+    score = float(request.args["score"])
 
-    queryReturn = list();
-    identifications = dict();
+    queryReturn = list()
+    identifications = dict()
     if gameType != 4:
-        identifications["gameType"] = gameType;
+        identifications["gameType"] = gameType
     if position in [0, 1]:
         if len(search) > 0:
-            identifications["entity"] = search;
-        identifications["count"] = { "$gte": count };
-        identifications["score"] = { "$gte": score };
-        cursor = db.feedbacks.find(identifications);
+            identifications["entity"] = search
+        identifications["count"] = { "$gte": count }
+        identifications["score"] = { "$gte": score }
+        cursor = db.feedbacks.find(identifications)
         for item in cursor:
-            jsonItem = dict();
-            jsonItem["category"] = item["category"];
-            jsonItem["entity"] = item["entity"];
-            jsonItem["count"] = item["count"];
-            jsonItem["gameType"] = item["gameType"];
-            jsonItem["isInNell"] = item["isInNell"];
-            jsonItem["score"] = item["score"];
-            jsonItem["lazy"] = item["lazy"];
-            queryReturn.append(jsonItem);
+            jsonItem = dict()
+            jsonItem["category"] = item["category"]
+            jsonItem["entity"] = item["entity"]
+            jsonItem["count"] = item["count"]
+            jsonItem["gameType"] = item["gameType"]
+            jsonItem["isInNell"] = item["isInNell"]
+            jsonItem["score"] = item["score"]
+            jsonItem["lazy"] = item["lazy"]
+            queryReturn.append(jsonItem)
 
-    identifications = dict();
+    identifications = dict()
     if gameType != 4:
-        identifications["gameType"] = gameType;
+        identifications["gameType"] = gameType
     if position in [0, 2]:
         if len(search) > 0:
-            identifications["category"] = search;
-        identifications["count"] = { "$gte": count };
-        identifications["score"] = { "$gte": score };
-        cursor = db.feedbacks.find(identifications);
+            identifications["category"] = search
+        identifications["count"] = { "$gte": count }
+        identifications["score"] = { "$gte": score }
+        cursor = db.feedbacks.find(identifications)
         for item in cursor:
-            jsonItem = dict();
-            jsonItem["category"] = item["category"];
-            jsonItem["entity"] = item["entity"];
-            jsonItem["count"] = item["count"];
-            jsonItem["gameType"] = item["gameType"];
-            jsonItem["isInNell"] = item["isInNell"];
-            jsonItem["score"] = item["score"];
-            jsonItem["lazy"] = item["lazy"];
-            queryReturn.append(jsonItem);
+            jsonItem = dict()
+            jsonItem["category"] = item["category"]
+            jsonItem["entity"] = item["entity"]
+            jsonItem["count"] = item["count"]
+            jsonItem["gameType"] = item["gameType"]
+            jsonItem["isInNell"] = item["isInNell"]
+            jsonItem["score"] = item["score"]
+            jsonItem["lazy"] = item["lazy"]
+            queryReturn.append(jsonItem)
 
-    return "<pre>" + str(json.dumps(queryReturn, ensure_ascii=False, indent=1)) + "</pre>";
+    return "<pre>" + str(json.dumps(queryReturn, ensure_ascii=False, indent=1)) + "</pre>"
 
 #################################### ERROR ####################################
 @app.errorhandler(404)
@@ -661,59 +592,65 @@ def page_not_found(error):
 
 @app.route("/ajax_isGameReady", methods=["POST"])
 def ajax_isGameReady():
-    data = request.get_json();
-    gameID = ObjectId(data["gameID"]);
+    data = request.get_json()
+    gameID = ObjectId(data["gameID"])
 
-    identifications = dict();
-    identifications["_id"] = gameID;
+    identifications = dict()
+    identifications["_id"] = gameID
 
-    return jsonify(result=isGameReady(identifications));
+    return jsonify(result=isGameReady(identifications))
+
 
 @app.route("/ajax_isGameOver", methods=["POST"])
 def ajax_isGameOver():
-    data = request.get_json();
-    gameID = ObjectId(data["gameID"]);
-    userID = ObjectId(data["userID"]);
+    data = request.get_json()
+    gameID = ObjectId(data["gameID"])
+    userID = ObjectId(data["userID"])
 
-    identifications = dict();
-    identifications["_id"] = gameID;
+    identifications = dict()
+    identifications["_id"] = gameID
 
-    score = -1;
-    enemyScore = -1;
-    if(checkGameStatus(identifications) == 1):
-        game = getGame(identifications);
-        
-        if(game["winner"] == None):
-            enemyScore = 0;
-            score = game["score1"];
-            
+    score = -1
+    enemyScore = -1
+    if checkGameStatus(identifications) == 1:
+        game = getGame(identifications)
+
+        if game["winner"] == None:
+            enemyScore = 0
+            score = game["score1"]
+
         else:
-            if(game["user1"]["_id"] == userID):
-                score = game["score1"];
-                enemyScore = game["score2"];
+            if game["user1"]["_id"] == userID:
+                score = game["score1"]
+                enemyScore = game["score2"]
             else:
-                score = game["score2"];
-                enemyScore = game["score1"];
+                score = game["score2"]
+                enemyScore = game["score1"]
 
-    return jsonify(myScore=score, opponentScore=enemyScore);
+    return jsonify(myScore=score, opponentScore=enemyScore)
+
 
 @app.route("/ajax_saveData", methods=["POST"])
 def ajax_saveData():
-    data = request.get_json();
-    gameID = ObjectId(data["gameID"]);
-    userID = ObjectId(data["userID"]);
+    data = request.get_json()
+    gameID = ObjectId(data["gameID"])
+    userID = ObjectId(data["userID"])
+    gameType = int(data["gameType"])
 
-    identifications = dict();
-    identifications["_id"] = ObjectId(gameID);
+    identifications = dict()
+    identifications["_id"] = ObjectId(gameID)
 
-    updates = dict();
-    #print("no metodo saveData", file=sys.stderr);
+    updates = dict()
 
-    if(userFromGame(identifications, 1)["_id"] == userID):
-        updates["data1"] = data["data"];
-    else:
-        updates["data2"] = data["data"];
+    if gameType == 1:
+        if userFromGame(identifications, 1)["_id"] == userID:
+            updates["data1"] = data["data"]
+        else:
+            updates["data2"] = data["data"]
+    elif gameType == 2:
+        updates["data1"] = data["data"]
+        updates["score1"] = int(data["score"])
 
-    r = (updateGame(identifications, updates) and finishGame(identifications));
+    r = (updateGame(identifications, updates) and finishGame(identifications))
 
-    return jsonify(result=r);
+    return jsonify(result=r)
