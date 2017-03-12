@@ -3,6 +3,10 @@ from app import db
 from random import randint
 import sys
 
+def toHash(inputString):
+    import hashlib
+    return hashlib.sha512(inputString).hexdigest()
+
 def setFeedback(entity, category, numOccurrences, numVictories, gameType, scoreInNell = -1):
 
     identifications = dict()

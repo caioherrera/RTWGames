@@ -83,7 +83,7 @@ def login():
     elif request.method == "POST":
         identifications = dict()
         identifications["email"] = request.form["user"]
-        identifications["password"] = request.form["password"]
+        identifications["password"] = toHash(request.form["password"])
         user = getUser(identifications)
         if user != None:
             changeUserStatus(identifications, True)
@@ -92,7 +92,7 @@ def login():
         else:
             identifications = dict()
             identifications["user"] = request.form["user"]
-            identifications["password"] = request.form["password"]
+            identifications["password"] = toHash(request.form["password"])
             user = getUser(identifications)
             if user != None:
                 changeUserStatus(identifications, True)
@@ -120,7 +120,7 @@ def register():
         elif getUser({"email": request.form["email"]}) != None:
             return render_template("register.html", code = 4)
         else:
-            if createUser(email, user, password, permission) != None:
+            if createUser(email, user, toHash(password), permission) != None:
                 return render_template("register.html", code = 1)
             else:
                 return render_template("register.html", code = 5)
