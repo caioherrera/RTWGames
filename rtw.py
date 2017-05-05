@@ -32,18 +32,9 @@ def setFeedback(entity, category, numOccurrences, numVictories, gameType, scoreI
     existingFeedback = getFeedback(identifications)
     score = scoreInNell
 
-    '''print("-----")
-    print(existingFeedback["entity"] + " - " + existingFeedback["category"])
-    print(score)
-    print(existingFeedback["numVictories"]["total"] + numVictories)
-    print(existingFeedback["numOccurrences"]["total"] + numOccurrences)'''
-
     if (existingFeedback["numOccurrences"]["total"] + numOccurrences) > 0:
         score += float(existingFeedback["numVictories"]["total"] + numVictories) / \
                  (existingFeedback["numOccurrences"]["total"] + numOccurrences)
-
-    '''print(score)
-    print("-----")'''
 
     updates = dict()
     updates["scoreInNell"] = scoreInNell

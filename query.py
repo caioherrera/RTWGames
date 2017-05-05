@@ -355,7 +355,7 @@ def finishGame(identifications):
                     for entity in data1[category]:
 
                         numVictories = 0
-                        if score1 > 0:
+                        if ((35 - score1) / 5) == len(data1[category]):
                             numVictories = 1
 
                         setFeedback(entity, category, 1, numVictories, gameType)
@@ -425,7 +425,7 @@ def finishGame(identifications):
                 return False
 
             if gameType == 1 or gameType == 3:
-                return setUser(updates["winner"], 0,1, gameType, cursor[0]["theme"])
+                return setUser(updates["winner"], 0, 1, gameType, cursor[0]["theme"])
 
             return True
 
