@@ -1,94 +1,120 @@
-var objects = "";
+var userID, gameID, theme;
+var userData = [];
+var score = 0;
+const hints = 3;
+const points = 5;
+
+$(document).ready(function() {
+
+	userID = $("#userID").text();
+	gameID = $("#gameID").text();
+	theme = $("#theme").text();
+
+	$("#btnOk").prop("disabled", true);
+
+	//weird for
+	for(var i = 0; i < hints; i++)
+		userData.push("");
+
+	$("#divGame").hide();
+	$("#message").html("Waiting for your opponent...<br>");
+    
+	var data = {"gameID": gameID};
+	var calls = setInterval(isGameReady, 500);
+	
+	function isGameReady() {
+
+		$.ajax({
+			url: "/ajax_isGameReady",
+			data: JSON.stringify(data),
+			contentType: "application/json;charset=UTF-8",
+			type: "POST",
+			success: function(response) {
+				result = response["result"];
+				if(result) {
+					clearInterval(calls);
+					$("#message").html("Opponent found!<br><br>");
+					$("#divGame").show();
+				}
+			},
+			error: function(request, status, error) {
+				$("#message").text(request.responseText);
+			}
+		});
+
+	};
+
+});
 
 function testClick(e, number) {
 	e = e || window.event;
+	
+	var disabled = false;	
+
+	for(var i = 0; i < hints; i++) {
+		var value = $("#txtKey" + i).val();
+		if(value == "")
+			disabled = true;
+	}
+
+	$("#btnOk").prop("disabled", disabled);	
+
 	if(e.keyCode == 13) {
-		newObject(number);
+		if(number < hints - 1)
+			$("#txtKey" + (number + 1)).focus();
+		else
+			$("#btnOk").focus();
 		return false;
 	}
 	return true;
 }
 
-function newObject(number) {
-	var txt = "";
-	if(number == 1)
-		document.getElementById("key2").focus();
-	else if(number == 2)
-		document.getElementById("key3").focus();
-	else
-		document.getElementById("ok").focus();
+function addData(number) {
+	var key = "#txtKey" + number;
+	var d = $(key).val();
+	var disabled = false;
+
+	if(d != "") {
+		userData[number] = d;
+		score += 5;
+	}
 }
 
-function startGame(usuario, tema) {
-	//timer = document.getElementById("timer");
-	document.getElementById("start").disabled = true;
-	
-	theme = document.getElementById("theme");
-	theme.value = tema.toLowerCase();
+function endGame() {
+	$("#divGame").hide();
 
-	document.getElementById("key1").readOnly = false;
-	document.getElementById("key2").readOnly = false;
-	document.getElementById("key3").readOnly = false;
-	document.getElementById("ok").disabled = false;
-	document.getElementById("key1").focus();
+	score = 0;
 
-//	startTimer(30, timer, usuario);
-}
+	for(var i = 0; i < hints; i++)
+		addData(i);
 
-function sendForm() {
+	var data = {"gameID": gameID, "userID": userID, "data": userData, "gameType": 3, "score": score};
+	var saved = false;
 
-	objects = "";
-
-	var txt1 = document.getElementById("key1").value.toLowerCase();
-	var txt2 = document.getElementById("key2").value.toLowerCase();
-	var txt3 = document.getElementById("key3").value.toLowerCase();
-
-	if(txt1 != "") 
-		objects += txt1;
-	if(objects != "")
-		objects += "||";	
-
-	if(txt2 != "")
-		objects += txt2;
-	if(objects != "") 
-		objects += "||";	
-	
-	if(txt3 != "")
-		objects += txt3;
-	if(objects != "")
-		objects += "||";
-
-	document.getElementById("data").value = objects;
-	document.forms["sendData"].submit();
-}
-
-/*function startTimer(duration, display, username) {
-	var timer = duration, minutes, seconds;
-	setInterval(function() {
-		minutes = parseInt(timer / 60, 10);
-		seconds = parseInt(timer % 60, 10);
-
-		minutes = minutes < 10 ? "0" + minutes : minutes;
-		seconds = seconds < 10 ? "0" + seconds : seconds;
-		display.textContent = "Time remaining: " + minutes + ":" + seconds;
-
-		if(timer-- <= 0) {
-			next = document.getElementById("next");
-			next.value = "";
-			next.readOnly = true;
-			timer = 0
-			data = document.getElementById("data");
-			data.value = objects;
-			document.forms["sendData"].submit();
+	$.ajax({
+		url: "/ajax_saveData",
+		data: JSON.stringify(data),
+		contentType: "application/json;charset=UTF-8",
+		type: "POST",
+		success: function(response) { 
+			saved = response["result"];
+		}, 
+		error: function(request, status, error) { 
+			$("#message").text(request.responseText);
 		}
-	}, 1000);
-}*/
+	});	
 
-window.onload = function() {
-	document.getElementById("start").disabled = false;
-	document.getElementById("key1").value = "";
-	document.getElementById("key2").value = "";
-	document.getElementById("key3").value = "";
-	document.getElementById("ok").disabled = true;
-	document.getElementById("theme").value = "";
+	$("#message").html("You scored " + score + " points!<br>"
+	+ "<a class='underlineLink' href='{{ url_for(\"thirdGameB\", game = game) }}'>Click here</a> to play the second part of this game.<br><br>");
+
+}
+
+function startGame() {
+	$("#btnStart").prop("disabled", true);
+	$("#btnOk").prop("disabled", true);
+	$("#txtTheme").prop("readOnly", true);
+	$("#txtTheme").val(theme);
+	for(var i = 0; i < hints; i++) 
+		$("#txtKey" + i).prop("readOnly", false);
+	$("#txtKey0").focus();
 }

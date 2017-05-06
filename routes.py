@@ -241,79 +241,49 @@ def secondGame():
 
 #################################### THIRD GAME A ####################################
 @app.route("/thirdGameA")
-@app.route("/thirdGameA/<game>")
-def thirdGameA(game = None):
+def thirdGameA():
     if session.get("user"):
         identifications = dict()
         identifications["user"] = session["user"]
         user = getUser(identifications)
         if user != None:
+            identifications = dict()
+            identifications["gameType"] = 3
+            game = findWaitingGame(identifications, user["_id"])
             if game == None:
+
+                category = pickRandomCategory()
+                dataId = dict()
+                dataId["category"] = category["name"][0]
+                sortCriteria = [("score", 1)]
+                maxValues = 10
+                theme1 = pickRandomFeedback(dataId, sortCriteria, maxValues)
+                theme2 = theme1
+                while theme2 == theme1:
+                    theme2 = pickRandomFeedback(dataId, sortCriteria, maxValues)
+
                 identifications = dict()
+                themes = (theme1, theme2)
+                identifications["theme"] = themes
                 identifications["gameType"] = 3
-                game = findWaitingGame(identifications, user["_id"])
-                if game == None:
+                game = createGame(identifications)
+                identifications["_id"] = game
+                joinGame(identifications, user["_id"])
+                return render_template("thirdGameA.html", theme = theme1, game = str(game), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
 
-                    category = pickRandomCategory()
-                    dataId = dict()
-                    dataId["category"] = category["name"][0]
-                    sortCriteria = [("score", 1)]
-                    maxValues = 10
-                    theme1 = pickRandomFeedback(dataId, sortCriteria, maxValues)
-                    theme2 = theme1
-                    while theme2 == theme1:
-                        theme2 = pickRandomFeedback(dataId, sortCriteria, maxValues)
-                    identifications["theme"] = "||".join((theme1, theme2))
-                    game = createGame(identifications)
-                    identifications["_id"] = game
-                    joinGame(identifications, user["_id"])
-
-                    return render_template("thirdGameA.html", username = user["user"], code = 0, theme = theme1, game = str(game), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-
-                else:
-                    identifications = dict()
-                    identifications["_id"] = game["_id"]
-                    joinGame(identifications, user["_id"])
-                    if isGameReady(identifications):
-                        theme = game["theme"].split("||")[1]
-                        startGame(identifications)
-                        return render_template("thirdGameA.html", username = user["user"], code = 2, theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        theme = game["theme"].split("||")[0]
-                        return render_template("thirdGameA.html", username = user["user"], code = 0, theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
             else:
-                idGame = -1
-                theme = ""
-                status = 4
-                if len(game) != 24:
-                    return render_template("thirdGameA.html", username = user["user"], code = status, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
                 identifications = dict()
-                identifications["_id"] = ObjectId(game)
-                game = getGame(identifications)
-                if game != None:
-                    theme = game["theme"]
-                    status = game["status"]
-                    idGame = game["_id"]
-                if status == 1:
-                    if user["_id"] == userFromGame(identifications, 1)["_id"]:
-                        return render_template("thirdGameA.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score1"]), admin = isUserAdmin({"user": session["user"]}))
-                    elif user["_id"] == userFromGame(identifications, 2)["_id"]:
-                        return render_template("thirdGameA.html", username = user["user"], code = 10, theme = theme, game = idGame, _id = str(user["_id"]), score = int(game["score2"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        return render_template("thirdGameA.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                else:
-                    if user["_id"] == userFromGame(identifications, 1)["_id"]:
-                        return render_template("thirdGameA.html", username = user["user"], code = status, theme = theme.split("||")[0], game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                    elif user["_id"] == userFromGame(identifications, 2)["_id"]:
-                        if status == 3:
-                            return render_template("thirdGameA.html", username = user["user"], code = status, theme = theme.split("||")[1], game = idGame, _id = str(user["_id"]), data = game["data1"], admin = isUserAdmin({"user": session["user"]}))
-                        else: return render_template("thirdGameA.html", username = user["user"], code = status, theme = theme.split("||")[1], game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
-                    else:
-                        return render_template("thirdGameA.html", username = user["user"], code = 1, theme = theme, game = idGame, _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+                identifications["_id"] = game["_id"]
+                joinGame(identifications, user["_id"])
+                theme = game["theme"][1]
+                if isGameReady(identifications):
+                    startGame(identifications)
+                return render_template("thirdGameA.html", theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
         else:
             return redirect(url_for("login"))
     else:
         return redirect(url_for("login"))
+
 
 #################################### THIRD GAME B ####################################
 @app.route("/thirdGameB")
@@ -650,6 +620,13 @@ def ajax_saveData():
     elif gameType == 2:
         updates["data1"] = data["data"]
         updates["score1"] = int(data["score"])
+    elif gameType == 3:
+        if userFromGame(identifications, 1)["_id"] == userID:
+            updates["data1"] = data["data"]
+            updates["score1"] = int(data["score"])
+        else:
+            updates["data2"] = data["data"]
+            updates["score2"] = int(data["score"])
 
     r = (updateGame(identifications, updates) and finishGame(identifications))
 

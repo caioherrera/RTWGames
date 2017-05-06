@@ -236,6 +236,12 @@ def joinGame(identifications, user):
         gameType = cursor[0]["gameType"]
         theme = cursor[0]["theme"]
 
+	if gameType == 3:
+		if key == "user1":
+			theme = theme[1];
+		else:
+			theme = theme[0];
+
         for k in updates[key]["numMatches"].keys():
             if k != "total" and k != theme:
                 updates[key]["numMatches"].pop(k, None)
@@ -377,7 +383,7 @@ def finishGame(identifications):
                     updates["winner"] = cursor[0]["user2"]["_id"]
 
                 for category in data1:
-                    entity = subIdentifications["name"].split("||")[0]
+                    entity = subIdentifications["name"][1]
 
                     numVictories = 0
                     if score1 > score2:
@@ -386,7 +392,7 @@ def finishGame(identifications):
                     setFeedback(entity, category, 1, numVictories, gameType)
 
                 for category in data2:
-                    entity = subIdentifications["name"].split("||")[0]
+                    entity = subIdentifications["name"][0]
 
                     numVictories = 0
                     if score1 < score2:
@@ -424,8 +430,13 @@ def finishGame(identifications):
             if not updateGame(identifications, updates):
                 return False
 
-            if gameType == 1 or gameType == 3:
+            if gameType == 1:
                 return setUser(updates["winner"], 0, 1, gameType, cursor[0]["theme"])
+            elif gameType == 3:
+		if updates["winner"] == cursor[0]["user1"]["_id"]:
+	                return setUser(updates["winner"], 0, 1, gameType, cursor[0]["theme"][1])
+		else:
+	                return setUser(updates["winner"], 0, 1, gameType, cursor[0]["theme"][0])
 
             return True
 
