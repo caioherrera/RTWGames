@@ -32,26 +32,51 @@
         	<div id="body">
 			<h2>Third Game</h2>
 				
-				<p id="gameID" hidden>{{ game }}</p>
-				<p id="userID" hidden>{{ _id }}</p>
-				<p id="theme" hidden>{{ theme }}</p>
-				<pre id="message">Waiting for your opponent...</pre>
+			<p id="gameID" hidden>{{ game }}</p>
+			<p id="userID" hidden>{{ _id }}</p>
+			{% for i in range(2) %}
+				<p id="theme{{ i }}" hidden>{{ theme[i] }}</p>
+			{% endfor %}
+			<p id="user" hidden>{{ user }}</p>
+			<pre id="message">Waiting for your opponent...</pre>
 
-				<div id="divGame">
-	              			<input type="button" id="btnStart" value="Start Game" onclick="startGame();"><br>
-                  			<p class="gameLabel">The theme of the round is</p>
-                  			<input type="text" readonly="true" id="txtTheme">
-                  			<p class="gameLabel">Describe it in 3 words or expressions</p>
-					<input type="text" readonly="true" id="txtKey0" onkeypress="return testClick(event, 0);"><br>
-					<p><input type="text" readonly="true" id="txtKey1" onkeypress="return testClick(event, 1);"></p>
-					<p><input type="text" readonly="true" id="txtKey2" onkeypress="return testClick(event, 2);"></p>
-					<input type="button" id="btnOk" value="OK" onclick="endGame()"><br>
-			  	</div>
+			<div id="divGameA">
+              			<input type="button" id="btnStartA" value="Start Game" onclick="startGameA();"><br>
+          			<p class="gameLabel">The theme of the round is</p>
+          			<input type="text" readonly="true" id="txtTheme">
+          			<p class="gameLabel">Describe it in 3 words or expressions</p>
+				<input type="text" readonly="true" id="txtKey0" onkeypress="return testClick(event, 0);"><br>
+				<p><input type="text" readonly="true" id="txtKey1" onkeypress="return testClick(event, 1);"></p>
+				<p><input type="text" readonly="true" id="txtKey2" onkeypress="return testClick(event, 2);"></p>
+				<input type="button" id="btnOk" value="OK" onclick="endGame()"><br>
+		  	</div>
 
-            <div id="footer">
-	        	Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
-            </div>
+			<pre id="afterMessage">You scored %d points!<br><a class="underlineLink" href="javascript:PrepareGame();">Click here</a> to play the second part of this game.<br><br></pre>
+
+			<div id="divGameB">
+              			<input type="button" id="btnStartB" value="Start Game" onclick="startGameB();"><br>
+		                <p class="gameLabel">Next guess</p>
+				<input type="text" readonly="true" id="txtNext" onkeypress="return testClickB?????????????(event);"><br>
+          			<table>
+					<tr height=30></tr>
+			            	<tr>
+			                	<td>
+							<p class="gameType">Hints</p>
+			                		<select size=5 readonly="true" id="lstHints" width="100"></select>
+			                	</td>
+						<td width=50></td>
+			                	<td>
+							<p class="gameType">Previous entries</p>
+			                		<select size=5 readonly="true" id="lstPrevious" width="100"></select>
+			                	</td>
+			                </tr>
+				</table>
+				<p id="timer"></p>
+			</div>
+		</div>
+		<div id="footer">
+			Caio Guimarães Herrera · <a class="underlineLink" href="https://github.com/caioherrera">Github</a> · <a class="underlineLink" href="br.linkedin.com/in/caioherrera">Linkedin</a> · <a class="underlineLink" href="mailto:caio.herrera@outlook.com">E-mail</a>
+		</div>
          </div>
-    </div>
 </body>
 </html>

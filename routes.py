@@ -269,16 +269,16 @@ def thirdGameA():
                 game = createGame(identifications)
                 identifications["_id"] = game
                 joinGame(identifications, user["_id"])
-                return render_template("thirdGameA.html", theme = theme1, game = str(game), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+                return render_template("thirdGameA.html", theme = themes, game = str(game), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}), user = 1)
 
             else:
                 identifications = dict()
                 identifications["_id"] = game["_id"]
                 joinGame(identifications, user["_id"])
-                theme = game["theme"][1]
                 if isGameReady(identifications):
                     startGame(identifications)
-                return render_template("thirdGameA.html", theme = theme, game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}))
+                return render_template("thirdGameA.html", theme = game["theme"], game = str(game["_id"]), _id = str(user["_id"]), admin = isUserAdmin({"user": session["user"]}), user = 2)
+
         else:
             return redirect(url_for("login"))
     else:
@@ -608,7 +608,7 @@ def ajax_saveData():
     gameType = int(data["gameType"])
 
     identifications = dict()
-    identifications["_id"] = ObjectId(gameID)
+    identifications["_id"] = gameID
 
     updates = dict()
 
@@ -631,3 +631,18 @@ def ajax_saveData():
     r = (updateGame(identifications, updates) and finishGame(identifications))
 
     return jsonify(result=r)
+
+@app.route("/ajax_getData", methods=["POST"])
+def ajax_getData():
+	data = request.json()
+	user = int(data["user"])
+	gameID = ObjectId(data["gameID"])
+		
+	identifications = dict()
+	identifications["_id"] = gameID
+
+	game = getGame(identifications)
+	if user == 1:
+		return jsonify(data = game["data1"])
+	else:
+		return jsonify(data = game["data2"])
